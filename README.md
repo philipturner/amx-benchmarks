@@ -36,6 +36,23 @@ BF16 GFLOPS = 2 * BITWIDTH / 16 * GHz = (32, 64) * GHz
 
 On both M1 and M2, the AMX bandwidth is also close to the register-ALU bandwidth. The P-CPU's ALUs consume 1024 bits/cycle (FADD, 2 operands) or 1536 bits/cycle (FFMA, 3 operands). On A14/M1, the E-cores have half the register bandwidth (256 bits/vector operand instead of 512) and probably half the AMX bandwidth too. The result: 2 AMX blocks/E-block instead of 4. Apple did not change this paradigm with A15/M2. The P-cores get double bandwidth, the E-cores do not.
 
+```
+GPU core:
+ALU_WIDTH = 64 (A14), 128 (M1, A15)
+FP32 GFLOPS = 2 * ALU_WIDTH * GHz = (128, 256) * GHz
+FP16 GFLOPS = 2 * 128 * GHz = 256 * GHz
+
+ANE core:
+FP16 GFLOPS = 2 * 16 * 16 * GHz = 512 * GHz
+```
+
+| Core Type | FP64 GFLOPS Formula | FP32 GFLOPS Formula | FP16 GFLOPS Formula |
+| --------- | ------------------- | ---------- | ------------------- |
+| P-CPU core | 2 * 512 / 64 * GHz | 2 * 512 / 32 * GHz | 2 * 512 / 16 * GHz |
+| M1 GPU core | - | 2 * 128 * GHz | 2 * 128 * GHz |
+| A12 ANE core | - | - | 2 * 16 * 16 * GHz |
+| AMX block | 2 * 4 * 4 * GHz | 2 * 8 * 8 * GHz | 2 * 16 * 16 * GHz / 2 |
+
 Here are my two setups. Notice that within each P-block, the generation's CPU-AMX bandwidth allows a single\* core to access all the available AMX blocks. The A14/M1 generation has 4 AMX blocks/P-block. The A15/M2 generation has 8 AMX blocks/P-clock. The number of CPU cores varies within the generation, at either 2-4 per P-block. The M1 Max cannot access all 8 AMX blocks from one CPU core, but its P-CPU is divided into two P-blocks. In contrast, A15 has only a single P-block, but can harness more AMX blocks per P-block. 
 
 > \*Accelerate probably doesn't want to have >1 CPU cores/P-block active while using the AMX. That would slightly throttle the block's clock speed without boosting theoretical processing power. This aligns with my GEMM benchmarks on M1 Max, which never utilize more than 200% CPU in the activity monitor. The chip has 2 P-blocks, which translates to 2 threads at full utilization.
