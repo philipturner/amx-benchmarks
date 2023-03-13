@@ -88,6 +88,27 @@ It looks like the A15 on my iPhone 13 Pro Max is more suited for running quantum
 
 Furthermore, BF16 would quadruple the arithmetic intensity of AMX calculations, only requiring 1024 bits/cycle of CPU-AMX bandwidth while still doubling GFLOPS. Alternatively, BF16xBF16=FP32 would sustain the same GFLOPS as the M1 Max's entire P-CPU with only 512 bits/cycle of CPU-AMX bandwidth. The greater dynamic range of BF16 makes it more likely than FP16 to replace FP32 for general-purpose processing. BF16 would also double the single-core NEON general-purpose FFMA processing power to 205 GFLOPS. It may halve the <s>memory</s> SLC bandwidth and accelerate O(n^2) GEMV operations that don't fit on the AMX. But even without utilizing BF16, the A15 still seems like the ideal chip for mixed FP32-FP64 quantum chemistry.
 
+---
+
+The library at [xrq-phys/blis_apple](https://github.com/xrq-phys/blis_apple) showed FP64 and FP32 GEMM performance as unchanged at between the M1 and M2 P-block. There are two explanations. (1) My explanation so far is correct. The AMX block itself has the same processing power, and all performance metrics doubled with the generational jump. The real-valued SGEMM algorithm is just bottlenecked by L2D bandwidth. A properly formatted complex-valued GEMM would double the ALU utilization. (2) I'm starting to think a second explanation is true. On the die shots, M2 AMX blocks look slightly smaller than M1 AMX blocks. The E-CPU still has two AMX blocks, but they are larger than blocks in P-CPU. Apple may have changed the performance ratio with the next generation:
+- E-AMX stays the same as before, with nice CPU-AMX bandwidth boost to increase utilization.
+- P-AMX changes the architecture, while adding hardware-accelerated BF16 at double the FP16 rate of the previous generation. Each AMX block has the performance characteristics outlined below. On top of that, ISA improvements increase the O(n^2) GEMV throughput for vecfp operations. The latter  could significantly accelerate FP32 math even though O(n^3) GEMM performance stagnates.
+
+```
+Previous A13/Current A15 E-AMX block
+FP64 GFLOPS = 2 * 4 * 4 * GHz = 32 * GHz
+FP32 GFLOPS = 2 * 8 * 8 * GHz = 128 * GHz
+FP16 GFLOPS = 2 * 16 * 16 * GHz / 2 = 256 * GHz
+BF16 GFLOPS = 2 * 16 * 16 * GHz / 2 = 256 * GHz (A15 only)
+
+Potential A15 P-AMX block redesign
+FP64 GFLOPS = 2 * 2 * 4 * GHz = 16 * GHz
+FP32 GFLOPS = 2 * 4 * 8 * GHz = 64 * GHz
+FP16 GFLOPS = 2 * 8 * 16 * GHz = 256 * GHz
+BF16 GFLOPS = 2 * 8 * 16 * GHz = 256 * GHz
+Removing the GHz / 2 convention; likely no longer takes 2 clock cycles
+```
+
 ## Linear Algebra Benchmark: GFLOPS/k
 
 GFLOPS is not a plural noun. GFLOPS is a rate: (G)Billion (FL)Floating Point (OP)Operations per (S)Second. People sometimes say GFLOPS/second to clarify. That translates to GFLOP/second/second. Data throughput is a measure of speed. Speed requires units of velocity, not acceleration. GFLOPs is a plural noun. Occasionally, I use GFLOPs to specify the number of floating-point operations required for a linear algebra operation.  Pay close attention to the capitalization of `s`. Source code in this repository should use `numGFLOP(S|s)` to clarify the difference, while respecting the convention of camel case.
