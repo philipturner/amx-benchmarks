@@ -38,7 +38,8 @@ On both M1 and M2, the AMX bandwidth is also close to the register-ALU bandwidth
 
 ```
 GPU core:
-ALU_WIDTH = 64 (A14), 128 (M1, A15)
+ALU_WIDTH = 64 (A14)
+ALU_WIDTH = 128 (M1, A15)
 FP32 GFLOPS = 2 * ALU_WIDTH * GHz = (128, 256) * GHz
 FP16 GFLOPS = 2 * 128 * GHz = 256 * GHz
 
