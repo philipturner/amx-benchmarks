@@ -49,14 +49,14 @@ FP16 GFLOPS = 2 * 16 * 16 * GHz = 512 * GHz
 | Core Type | FP64 GFLOPS Formula | FP32 GFLOPS Formula | FP16 GFLOPS Formula |
 | --------- | ------------------- | ---------- | ------------------- |
 | P-CPU core | 2 * 512 / 64 * GHz | 2 * 512 / 32 * GHz | 2 * 512 / 16 * GHz |
-| M1 GPU core | - | 2 * 128 * GHz | 2 * 128 * GHz |
+| M1 GPU core | - | 2 * 128 * GHz | - |
 | A12 ANE core | - | - | 2 * 16 * 16 * GHz |
 | AMX block | 2 * 4 * 4 * GHz | 2 * 8 * 8 * GHz | 2 * 16 * 16 * GHz / 2 |
 
 | Core Type | FP64 GFLOPS Formula | FP32 GFLOPS Formula | FP16 GFLOPS Formula |
 | --------- | ------------------- | ---------- | ------------------- |
 | P-CPU core | 16 * GHz | 32 * GHz | 64 * GHz |
-| M1 GPU core | - | 256 * GHz | 256 * GHz |
+| M1 GPU core | - | 256 * GHz | - |
 | A12 ANE core | - | - | 512 * GHz |
 | AMX block | 32 * GHz | 128 * GHz | 256 * GHz |
 
