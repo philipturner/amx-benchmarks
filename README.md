@@ -90,7 +90,7 @@ Furthermore, BF16 would quadruple the arithmetic intensity of AMX calculations, 
 
 ## Linear Algebra Benchmark: GFLOPS/k
 
-GFLOPS is not a plural noun. GFLOPS is a rate: (G)Billion (FL)Floating Point (OP)Operations per (S)Second. People sometimes say GFLOPS/second to clarify. That translates to GFLOP/second/second. Speed requires units of velocity, not acceleration. Occasionally, I use GFLOPs to specify the number of floating-point operations required for a linear algebra operation. GFLOPs is a plural noun. Pay close attention to the capitalization of `s`.
+GFLOPS is not a plural noun. GFLOPS is a rate: (G)Billion (FL)Floating Point (OP)Operations per (S)Second. People sometimes say GFLOPS/second to clarify. That translates to GFLOP/second/second. Data throughput is a measure of speed. Speed requires units of velocity, not acceleration. Occasionally, I use GFLOPs to specify the number of floating-point operations required for a linear algebra operation. GFLOPs is a plural noun. Pay close attention to the capitalization of `s`.
 
 TODO: Explain O(kn^3), uncertainty in computational complexity, visualize GFLOPS/k like the slope of a line, GFLOPS/0.25k for complex-valued operations
 
