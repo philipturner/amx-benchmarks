@@ -63,8 +63,6 @@ FP16 GFLOPS = 2 * 16 * 16 * GHz = 512 * GHz
 
 Here are my two setups. Notice that within each P-block, the generation's CPU-AMX bandwidth allows a single\* core to access all the available AMX blocks. The A14/M1 generation has 4 AMX blocks/P-block. The A15/M2 generation has 8 AMX blocks/P-clock. The number of CPU cores varies within the generation, at either 2-4 per P-block. The M1 Max cannot access all 8 AMX blocks from one CPU core, but its P-CPU is divided into two P-blocks. In contrast, A15 has only a single P-block, but can harness more AMX blocks per P-block. The AMX compute power scales with the square of register size (the amount of data passed into each AMX block per cycle). It only scales linearly with the number of AMX blocks, leading to diminishing returns on M2.
 
-> <b> We currently have no performance data for the A15/M2 AMX. There is a small chance that the A15/M2 P-block AMX coprocessor has 4x the compute power of the A14/M1 P-block AMX coprocessor. </b>
-
 > \*Accelerate probably doesn't want to have >1 CPU cores/P-block active while using the AMX. That would slightly throttle the block's clock speed without boosting theoretical processing power. This aligns with my GEMM benchmarks on M1 Max, which never utilize more than 200% CPU in the activity monitor. The chip has 2 P-blocks, which translates to 2 threads at full utilization.
 
 | AMX Processor | Clock Speed | AMX Blocks | FP64 GFLOPS | FP32 GFLOPS | BF16 GFLOPS |
@@ -111,7 +109,7 @@ TODO: Compare Apple's new BLAS library to the old BLAS library:
 
 ## Related Work
 
-| | ISA Documentation | Performance Documentation |
-| - | - | - |
-| Apple AMX | [corsix/amx](https://github.com/corsix/amx) | [philipturner/amx-benchmarks](https://github.com/philipturner/amx-benchmarks) |
-| Apple GPU | [dougallj/applegpu](https://github.com/dougallj/applegpu) | [philipturner/metal-benchmarks](https://github.com/philipturner/metal-benchmarks) |
+| | ISA Documentation | Performance Documentation | OSS GEMM Libraries |
+| - | - | - | - |
+| Apple AMX | [corsix/amx](https://github.com/corsix/amx) | [philipturner/amx-benchmarks](https://github.com/philipturner/amx-benchmarks) | [xrq-phys/blis_apple](https://github.com/xrq-phys/blis_apple) |
+| Apple GPU | [dougallj/applegpu](https://github.com/dougallj/applegpu) | [philipturner/metal-benchmarks](https://github.com/philipturner/metal-benchmarks) | [geohot/tinygrad](https://github.com/geohot/tinygrad) |
