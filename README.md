@@ -96,12 +96,14 @@ The library at [xrq-phys/blis_apple](https://github.com/xrq-phys/blis_apple) sho
 
 ```
 Previous A13/Current A15 E-AMX block
+1/4 Instruction/Cycle
 FP64 GFLOPS = 2 * 4 * 4 * GHz = 32 * GHz
 FP32 GFLOPS = 2 * 8 * 8 * GHz = 128 * GHz
 FP16 GFLOPS = 2 * 16 * 16 * GHz / 2 = 256 * GHz
 BF16 GFLOPS = 2 * 16 * 16 * GHz / 2 = 256 * GHz (A15 only)
 
 Potential A15 P-AMX block redesign
+1/8 Instruction/Cycle
 FP64 GFLOPS = 2 * 2 * 4 * GHz = 16 * GHz
 FP32 GFLOPS = 2 * 4 * 8 * GHz = 64 * GHz
 FP16 GFLOPS = 2 * 8 * 16 * GHz = 256 * GHz
