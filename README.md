@@ -68,7 +68,7 @@ k_real = 0.25k_complex
 
 TODO: Compare Apple's new BLAS library to the old BLAS library:
 - sgemm, dgemm, zgemm
-- ssyevd, dsyevd, zheev, faster \_2stage approaches added to the new LAPACK library
+- ssyevd, dsyevd, zheevd, faster \_2stage approaches added to the new LAPACK library
 - xcholesky, xpotrf, xtrsm
 - appleblas_xgeadd added to the new LAPACK library
 
