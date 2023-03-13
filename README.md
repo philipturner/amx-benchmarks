@@ -61,7 +61,9 @@ FP16 GFLOPS = 2 * 16 * 16 * GHz = 512 * GHz
 | A12 ANE core | - | - | 512 * GHz |
 | AMX block | 32 * GHz | 128 * GHz | 256 * GHz |
 
-Here are my two setups. Notice that within each P-block, the generation's CPU-AMX bandwidth allows a single\* core to access all the available AMX blocks. The A14/M1 generation has 4 AMX blocks/P-block. The A15/M2 generation has 8 AMX blocks/P-clock. The number of CPU cores varies within the generation, at either 2-4 per P-block. The M1 Max cannot access all 8 AMX blocks from one CPU core, but its P-CPU is divided into two P-blocks. In contrast, A15 has only a single P-block, but can harness more AMX blocks per P-block. 
+Here are my two setups. Notice that within each P-block, the generation's CPU-AMX bandwidth allows a single\* core to access all the available AMX blocks. The A14/M1 generation has 4 AMX blocks/P-block. The A15/M2 generation has 8 AMX blocks/P-clock. The number of CPU cores varies within the generation, at either 2-4 per P-block. The M1 Max cannot access all 8 AMX blocks from one CPU core, but its P-CPU is divided into two P-blocks. In contrast, A15 has only a single P-block, but can harness more AMX blocks per P-block. The AMX compute power scales with the square of register size (the amount of data passed into each AMX block per cycle). It only scales linearly with the number of AMX blocks, leading to diminishing returns on M2.
+
+> <b> We currently have no performance data for the A15/M2 AMX. There is a small chance that the A15/M2 P-block AMX coprocessor has 4x the compute power of the A14/M1 P-block AMX coprocessor. </b>
 
 > \*Accelerate probably doesn't want to have >1 CPU cores/P-block active while using the AMX. That would slightly throttle the block's clock speed without boosting theoretical processing power. This aligns with my GEMM benchmarks on M1 Max, which never utilize more than 200% CPU in the activity monitor. The chip has 2 P-blocks, which translates to 2 threads at full utilization.
 
@@ -86,7 +88,7 @@ Here are my two setups. Notice that within each P-block, the generation's CPU-AM
 
 It looks like the A15 on my iPhone 13 Pro Max is more suited for running quantum chemistry simulations than my M1 Max. With just a single CPU core, it can access the same AMX compute power as my M1 Max. This would simplify linear algebra kernels by removing the need for communication between multiple CPU threads. The A15 has less memory bandwidth, but that shouldn't be a problem if I keep everything in SLC. The A15's SLC can fit one 1448x1448 double-complex matrix, or the valence electrons of 362 carbon atoms. That amount of atoms is vastly more than what's feasible on modern desktops. So there's a very high chance I can keep the entire DFT simulation in SLC or even P-CPU L2D.
 
-Furthermore, BF16 would double the arithmetic intensity of AMX calculations, only requiring 1024 bits/cycle of CPU-AMX bandwidth. The greater dynamic range of BF16 makes it more likely than FP16 to be useful for general-purpose processing. BF16 would also double the single-core NEON general-purpose FFMA processing power to 205 GFLOPS. It may halve the <s>memory</s> SLC bandwidth and accelerate O(n^2) GEMV operations that don't fit on the AMX. But even without utilizing BF16, the A15 still seems like the ideal chip for mixed FP32-FP64 quantum chemistry.
+Furthermore, BF16 would quadruple the arithmetic intensity of AMX calculations, only requiring 1024 bits/cycle of CPU-AMX bandwidth while still doubling GFLOPS. Alternatively, BF16xBF16=FP32 would sustain the same GFLOPS as the M1 Max's entire P-CPU with only 512 bits/cycle of CPU-AMX bandwidth. The greater dynamic range of BF16 makes it more likely than FP16 to replace FP32 for general-purpose processing. BF16 would also double the single-core NEON general-purpose FFMA processing power to 205 GFLOPS. It may halve the <s>memory</s> SLC bandwidth and accelerate O(n^2) GEMV operations that don't fit on the AMX. But even without utilizing BF16, the A15 still seems like the ideal chip for mixed FP32-FP64 quantum chemistry.
 
 ## Linear Algebra Benchmark: GFLOPS/k
 
@@ -102,6 +104,7 @@ k_real = 0.25k_complex
 
 TODO: Compare Apple's new BLAS library to the old BLAS library:
 - sgemm, dgemm, zgemm
+- ssymm, dsymm, zhemm
 - ssyevd, dsyevd, zheevd, faster \_2stage approaches added to the new LAPACK library
 - xcholesky, xpotrf, xtrsm
 - appleblas_xgeadd added to the new LAPACK library
