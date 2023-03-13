@@ -4,7 +4,9 @@ This repository is intended to coalesce data about real-world performance of the
 
 ## Core Computing Unit: The AMX Block
 
-As with [metal-benchmarks](https://github.com/philipturner/metal-benchmarks), I will establish the AMX "block" as the core unit of processing power. This is analogous to an GPU core. On die shots of Apple chips, there are many different types of AMX coprocessors. The all have a common characteristic: numerous visible blocks. The amount of processing power can be calculated exactly from (a) the CPU clock speed and (b) the number of AMX blocks.
+As with [metal-benchmarks](https://github.com/philipturner/metal-benchmarks), I will establish the AMX "block" as the fundamental unit of processing power. This is analogous to the CPU "core" and the GPU "core"\*. On die shots of Apple chips, there are many different types of AMX coprocessors. The all have a common characteristic: numerous visible blocks. The amount of processing power can be calculated exactly from (a) the CPU clock speed and (b) the number of AMX blocks.
+
+> \*Fun fact: the Apple GPU has its own hidden CPU just to dispatch commands to all the GPU cores. This is probably inconspicuous - if someone locates it on the die shot, please notify me! I hypothesize it would be duplicated for the second half of the M1 Max GPU. It runs a modified version of the Darwin kernel and I have no idea what its clock speed is. AMD RDNA 3 has a "frontend" clock speed at 2.5 GHz, famously decoupled from the GPU cores' 2.3 GHz for power efficiency. The M1 Max half-GPU's dedicated CPU core would probably run at ~1 GHz.
 
 ```
 Formula:
