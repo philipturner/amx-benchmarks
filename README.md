@@ -133,6 +133,23 @@ TODO: Compare Apple's new BLAS library to the old BLAS library:
 - xcholesky, xpotrf, xtrsm
 - appleblas_xgeadd added to the new LAPACK library
 
+Testing increments of 128 between 256 and 1536, reporting fastest speed / optimal matrix size. Speed reported in GFLOPS/k for real, GFLOPS/0.25k for complex. Eigendecompositions will use \_2stage with the new BLAS, unless the divide-and-conquer algorithm shows a performance delta. OpenBLAS is accessed through NumPy, which may have a slight overhead compared to native Swift code.
+
+| Operation | M1 Max, OpenBLAS | M1 Max, Old BLAS | M1 Max, New BLAS | A15, Old BLAS | A15, New BLAS |
+| --------- | ---------------- | ---------------- | ---------------- | ------------- | ------------- |
+| SGEMM |
+| DGEMM |
+| ZGEMM |
+| SSYMM |
+| DSYMM |
+| ZHEMM |
+| SSYEVD (e-vals) |
+| DSYEVD (e-vals) |
+| ZHEEVD (e-vals) |
+| SSYEVD (e-vecs) |
+| DSYEVD (e-vecs) |
+| ZHEEVD (e-vecs) |
+
 ## Related Work
 
 | | ISA Documentation | Performance Documentation | OSS GEMM Libraries |
