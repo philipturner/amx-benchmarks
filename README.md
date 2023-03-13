@@ -44,3 +44,21 @@ Here are my two setups. Notice that within each P-block\*, the generation's CPU-
 | A15 P-CPU | 3.204 GHz | 2 | 512 bits | 102 | 205 | 410 |
 | M1 Max E-CPU | 2.064 GHz | 2 | 256 bits | 33 | 66 | - |
 | A15 E-CPU | 2.016 GHz | 4 | 256 bits | 64 | 129 | 258 |
+
+## Linear Algebra Benchmark: GFLOPS/k
+
+TODO: Explain O(kn^3), uncertainty in computational complexity, visualize GFLOPS/k like the slope of a line, GFLOPS/0.25k for complex-valued operations
+
+```
+Real:    GFLOPS = GFLOPS/k * k_real
+Complex: GFLOPS = GFLOPS/0.25k * 0.25k_complex
+
+k_complex = 4k_real
+k_real = 0.25k_complex
+```
+
+TODO: Compare Apple's new BLAS library to the old BLAS library:
+- sgemm, dgemm, zgemm
+- ssyevd, dsyevd, zheev, faster \_2stage approaches added to the new LAPACK library
+- xcholesky, xpotrf, xtrsm
+- appleblas_xgeadd added to the new LAPACK library
