@@ -1,6 +1,6 @@
 # AMX Benchmarks
 
-This repository is intended to coalesce data about real-world performance of the Apple AMX coprocessor. The end goal is to run quantum chemistry (DFT) simulations as fast as possible on Apple silicon. Therefore, it only focuses on data types and performance parameters likely useful toward the end goal. These include FP64, FP32, and BF16.
+This repository is intended to coalesce data about real-world performance of the Apple AMX coprocessor. The end goal is to run quantum chemistry (DFT) simulations as fast as possible on Apple silicon. Therefore, the repository focuses on data types and performance parameters potentially useful toward the end goal. Relevant data types include FP64, FP32, and BF16.
 
 ## Core Computing Unit: The AMX Block
 
@@ -33,14 +33,14 @@ Here are my two setups. Notice that within each P-block\*, the generation's CPU-
 
 | AMX Processor | Clock Speed | AMX Blocks | FP64 GFLOPS | FP32 GFLOPS | BF16 GFLOPS |
 | --------- | ----------- | ---------- | ----------- | ----------- | ----- |
-| M1 Max P-CPU | 3.228 GHz | 8 | 826 | 3305 | n/a |
+| M1 Max P-CPU | 3.228 GHz | 8 | 826 | 3305 | - |
 | A15 P-CPU | 3.204 GHz | 8 | 820 | 3280 | 6561 |
-| M1 Max E-CPU | 2.064 GHz | 2 | 132 | 528 | n/a |
+| M1 Max E-CPU | 2.064 GHz | 2 | 132 | 528 | - |
 | A15 E-CPU | 2.016 GHz | 2 | 129 | 516 | 1032 |
 
 | NEON Processor | Clock Speed | CPU Cores | Execution Width | FP64 GFLOPS | FP32 GFLOPS | BF16 GFLOPS |
 | --------- | ----------- | ---------- | ----------- | ------- | ----------- | ------ |
-| M1 Max P-CPU | 3.228 GHz | 8 | 512 bits |
-| A15 P-CPU | 3.204 GHz | 2 | 512 bits |
-| M1 Max E-CPU | 2.064 GHz | 2 | 256 bits |
-| A15 E-CPU | 2.016 GHz | 4 | 256 bits |
+| M1 Max P-CPU | 3.228 GHz | 8 | 512 bits | 413 | 826 | - |
+| A15 P-CPU | 3.204 GHz | 2 | 512 bits | 102 | 205 | 410 |
+| M1 Max E-CPU | 2.064 GHz | 2 | 256 bits | 33 | 66 | - |
+| A15 E-CPU | 2.016 GHz | 4 | 256 bits | 64 | 129 | 258 |
