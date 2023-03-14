@@ -1,6 +1,6 @@
 # AMX Benchmarks
 
-> Warning: This repository's current depiction of A15 FP64 and FP32 performance may be misleading. See the note at the end of [Core Computing Unit](#core-computing-unit-the-amx-block).
+> Warning: This repository's current depiction of A15 FP64 and FP32 performance may be misleading. See the note at the end of [Core Computing Unit](#core-computing-unit-the-amx-block). The depiction of CPU-AMX bandwidth also [needs to be corrected](https://forums.macrumors.com/threads/apple-silicon-in-sciences.2374458/post-32031599).
 
 This repository is intended to coalesce data about real-world performance of the Apple AMX coprocessor. The end goal is to run quantum chemistry (DFT) simulations as fast as possible on Apple silicon. Therefore, the repository focuses on data types and performance parameters potentially useful toward the end goal. Relevant data types include FP64, FP32, and BF16.
 
