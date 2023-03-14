@@ -137,14 +137,14 @@ TODO: Compare Apple's new BLAS library to the old BLAS library:
 
 Testing 10 different configurations - increments of 128 between 256 and 1408, reporting fastest speed / optimal matrix size. Speed reported in GFLOPS/k for real, GFLOPS/0.25k for complex. Eigendecompositions will use \_2stage with the new BLAS, unless the divide-and-conquer algorithm shows a performance delta. OpenBLAS is accessed through NumPy. That may put OpenBLAS at a slight disadvantage; Accelerate is accessed through lower-overhead Swift bindings.
 
-| Operation | M1 Max, OpenBLAS | M1 Max, Old BLAS | M1 Max, New BLAS | A15, Old BLAS | A15, New BLAS |
-| --------- | ---------------- | ---------------- | ---------------- | ------------- | ------------- |
-| SGEMM |
-| DGEMM |
-| ZGEMM |
-| SSYMM |
-| DSYMM |
-| ZHEMM |
+| Operation | k<sub>real</sub> | M1 Max, OpenBLAS | M1 Max, Old BLAS | M1 Max, New BLAS | A15, Old BLAS | A15, New BLAS |
+| --------- | ---------------- | ---------------- | ---------------- | ---------------- | ------------- | ------------- |
+| SGEMM | 2 |
+| DGEMM | 2 |
+| ZGEMM | 2 |
+| SSYMM | ??? |
+| DSYMM | ??? |
+| ZHEMM | ??? |
 | SSYEVD (e-vals) |
 | DSYEVD (e-vals) |
 | ZHEEVD (e-vals) |
