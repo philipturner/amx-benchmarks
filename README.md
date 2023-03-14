@@ -142,9 +142,6 @@ Testing 10 different configurations - increments of 128 between 256 and 1408, re
 | SGEMM | 2 |
 | DGEMM | 2 |
 | ZGEMM | 2 |
-| SSYMM | ??? |
-| DSYMM | ??? |
-| ZHEMM | ??? |
 | SSYEVD (e-vals) |
 | DSYEVD (e-vals) |
 | ZHEEVD (e-vals) |
