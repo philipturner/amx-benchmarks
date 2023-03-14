@@ -145,12 +145,12 @@ Testing 10 different configurations - increments of 128 between 256 and 1408, re
 | SSYMM | 2 |
 | DSYMM | 2 |
 | ZHEMM | 2 |
-| SSYEVD (e-vals) |
-| DSYEVD (e-vals) |
-| ZHEEVD (e-vals) |
-| SSYEVD (e-vecs) |
-| DSYEVD (e-vecs) |
-| ZHEEVD (e-vecs) |
+| SSYEVD (e-vals) | n/a |
+| DSYEVD (e-vals) | n/a |
+| ZHEEVD (e-vals) | n/a |
+| SSYEVD (e-vecs) | n/a |
+| DSYEVD (e-vecs) | n/a |
+| ZHEEVD (e-vecs) | n/a |
 
 ## Related Work
 
