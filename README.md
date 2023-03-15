@@ -140,6 +140,10 @@ Testing 10 different configurations - increments of 128 between 256 and 1408, re
 TODO: Use ChatGPT to generate the benchmarking code for me. So far it produced this which seems good. Hopefully don't need GPT-4 for the task.
 
 ```swift
+// Command 1: Generate C code that calls into the BLAS library to perform the DGEMM operation.
+// Command 2: Translate what you just wrote to Swift.
+// ---
+
 import Accelerate
 
 let m = 3, n = 4, k = 2  // Dimensions of A, B, and C
