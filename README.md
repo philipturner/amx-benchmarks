@@ -137,6 +137,40 @@ TODO: Compare Apple's new BLAS library to the old BLAS library:
 
 Testing 10 different configurations - increments of 128 between 256 and 1408, reporting fastest speed / optimal matrix size. Speed reported in GFLOPS/k for real, GFLOPS/0.25k for complex. Eigendecompositions will use \_2stage with the new BLAS, unless the divide-and-conquer algorithm shows a performance delta. OpenBLAS is accessed through NumPy. That may put OpenBLAS at a slight disadvantage; Accelerate is accessed through lower-overhead Swift bindings.
 
+TODO: Use ChatGPT to generate the benchmarking code for me. So far it produced this which seems good. Hopefully don't need GPT-4 for the task.
+
+```swift
+import Accelerate
+
+let m = 3, n = 4, k = 2  // Dimensions of A, B, and C
+
+// Define matrices A, B, and C as arrays
+var A = [Double](repeating: 0.0, count: m * k)
+var B = [Double](repeating: 0.0, count: k * n)
+var C = [Double](repeating: 0.0, count: m * n)
+
+// Fill matrices A and B with some data
+for i in 0..<m*k {
+    A[i] = Double(i)
+}
+for i in 0..<k*n {
+    B[i] = Double(i)
+}
+
+// Call BLAS to perform DGEMM
+let lda = k, ldb = n, ldc = n
+let alpha = 1.0, beta = 0.0
+cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, Int32(m), Int32(n), Int32(k), alpha, A, lda, B, ldb, beta, &C, ldc)
+
+// Print the result
+for i in 0..<m {
+    for j in 0..<n {
+        print("\(C[i * n + j]) ", terminator: "")
+    }
+    print("")
+}
+```
+
 | Operation | k<sub>real</sub> | M1 Max, OpenBLAS | M1 Max, Old BLAS | M1 Max, New BLAS | A15, Old BLAS | A15, New BLAS |
 | --------- | ---------------- | ---------------- | ---------------- | ---------------- | ------------- | ------------- |
 | SGEMM | 2 |
