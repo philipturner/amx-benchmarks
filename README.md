@@ -1,6 +1,6 @@
 # AMX Benchmarks
 
-> Warning: This repository's current depiction of A15 FP64 and FP32 performance may be misleading. See the note at the end of [Core Computing Unit](#core-computing-unit-the-amx-block). The depiction of CPU-AMX bandwidth also [needs to be corrected](https://forums.macrumors.com/threads/apple-silicon-in-sciences.2374458/post-32031599), along with E-AMX performance.
+
 
 This repository is intended to coalesce data about real-world performance of the Apple AMX coprocessor. The end goal is to run quantum chemistry (DFT) simulations as fast as possible on Apple silicon. Therefore, the repository focuses on data types and performance parameters potentially useful toward the end goal. Relevant data types include FP64, FP32, and BF16.
 
@@ -11,10 +11,13 @@ Table of Contents
 
 ## Core Computing Unit: The AMX Block
 
-# Multiple experts have indicated this repository's current explanation of the AMX is misleading. Please read the comment [here](https://github.com/corsix/amx/issues/6#issuecomment-1471006893).
+# Multiple experts have indicated this repository's previous explanation of the AMX was misleading. Please read the comment [here](https://github.com/corsix/amx/issues/6#issuecomment-1471006893).
 
-<details>
-<summary>I will fix this when I have the time to. For now, proceed with caution:</summary>
+I will fix this when I have the time to. For now, I have commented out the entire section in Markdown.
+
+<!--
+
+> Warning: This repository's current depiction of A15 FP64 and FP32 performance may be misleading. See the note at the end of [Core Computing Unit](#core-computing-unit-the-amx-block). The depiction of CPU-AMX bandwidth also [needs to be corrected](https://forums.macrumors.com/threads/apple-silicon-in-sciences.2374458/post-32031599), along with E-AMX performance.
 
 As with [metal-benchmarks](https://github.com/philipturner/metal-benchmarks), I will establish the AMX "block" as the fundamental unit of processing power. This is analogous to the CPU "core" and the GPU\* "core". On die shots of Apple chips, there are many different types of AMX coprocessors. The all have a common characteristic: numerous visible blocks. The amount of processing power can be calculated exactly from (a) the CPU clock speed and (b) the number of AMX blocks.
 
@@ -119,7 +122,7 @@ BF16 GFLOPS = 2 * 8 * 16 * GHz = 256 * GHz
 Removing the GHz / 2 convention; likely no longer takes 2 clock cycles
 ```
 
-</details>
+-->
 
 ## Linear Algebra Benchmark: GFLOPS/k
 
