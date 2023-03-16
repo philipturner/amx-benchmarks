@@ -1,3 +1,5 @@
+# Multiple experts have indicated this repository's current explanation of the AMX is misleading. Please read the comment [here](https://github.com/corsix/amx/issues/6#issuecomment-1471006893).
+
 # AMX Benchmarks
 
 > Warning: This repository's current depiction of A15 FP64 and FP32 performance may be misleading. See the note at the end of [Core Computing Unit](#core-computing-unit-the-amx-block). The depiction of CPU-AMX bandwidth also [needs to be corrected](https://forums.macrumors.com/threads/apple-silicon-in-sciences.2374458/post-32031599), along with E-AMX performance.
