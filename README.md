@@ -14,13 +14,15 @@ Table of Contents
 
 Hopefully this lets me run 10x more large-scale simulations, or more complex simulations at the same throughput. The intent is to generate enough data to train a neural network, or enable real-time reinforcement learning. This means I should not focus too much on optimizing the completion time of a single supermassive simulation. Rather, optimize latency when ~32 medium-sized simulations run on multiple CPU cores simultaneously.
 
-If a neural network can be trained, it might traverse a solution space more efficiently than brute force. This would boost performance much more than 10x. It also leads to another similar idea. The GPU can be harnessed for mixed-precision simulations (~1% FP64), with higher throughput but not catching ill-conditioned systems. After finding a few candidate nanostructures with promising results, validate them on the AMX with ~10% FP64. A final human validation can occur in 100% FP64.
+If a neural network can be trained, it might traverse a solution space more efficiently\* than brute force. This would boost performance much more than 10x. It also leads to another similar idea. The GPU can be harnessed for mixed-precision simulations (~1% FP64), with higher throughput but not catching ill-conditioned systems. After finding a few candidate nanostructures with promising results, validate them on the AMX with ~10% FP64. A final human validation can occur in 100% FP64.
+
+> \*Or generalize its knowledge to nanosystems so large, they take a day to validate through DFT.
 
 A good illustration might be this hierarchy:
-- 3D neural network: 50% FP16, 50% FP32, extremely high screening throughput
-- GPU DFT: 99-99.9% FP32, 0.1-1% FP64, high screening throughput
-- AMX DFT: 50-90% FP32, 10-50% FP64, reduced screening throughput
-- AMX DFT: 100% FP64, optimized for single-simulation latency
+- 3D neural network: 50% FP16, 50% FP32, extremely high screening throughput - O(n)
+- GPU DFT: 99-99.9% FP32, 0.1-1% FP64, high screening throughput - O(n^2) (memory-bound)
+- AMX DFT: 80-90% FP32, 10-20% FP64, reduced screening throughput - O(n^3)
+- AMX DFT: 100% FP64, optimized for single-simulation latency - O(n^3)
 
 <!--
 
