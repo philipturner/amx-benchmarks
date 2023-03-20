@@ -20,7 +20,7 @@ A good illustration might be this hierarchy:
 - Neural network: 50% FP16, 50% FP32, extremely high screening throughput
 - GPU DFT: 99-99.9% FP32, 0.1-1% FP64, high screening throughput
 - AMX DFT: 50-90% FP32, 10-50% FP64, reduced screening throughput
-- AMX DFT: 100% FP64, not used for screening the solution space
+- AMX DFT: 100% FP64, optimized for single-simulation latency
 
 <!--
 
