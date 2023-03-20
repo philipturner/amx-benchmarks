@@ -5,17 +5,19 @@
 This repository is intended to coalesce data about real-world performance of the Apple AMX coprocessor. The end goal is to run quantum chemistry (DFT) simulations as fast as possible on Apple silicon. Therefore, the repository focuses on data types and performance parameters potentially useful toward the end goal. Relevant data types include FP64, FP32, and BF16.
 
 Table of Contents
+<!--
 - [Core Computing Unit](#core-computing-unit-the-amx-block)
+-->
 - [Linear Algebra Benchmark](#linear-algebra-benchmark-gflopsk)
 - [Related Work](#related-work)
+
+<!--
 
 ## Core Computing Unit: The AMX Block
 
 # Multiple experts have indicated this repository's previous explanation of the AMX was misleading. Please read the comment [here](https://github.com/corsix/amx/issues/6#issuecomment-1471006893).
 
 I will fix this when I have the time to. For now, I have commented out the entire section in Markdown.
-
-<!--
 
 > Warning: This repository's current depiction of A15 FP64 and FP32 performance may be misleading. See the note at the end of [Core Computing Unit](#core-computing-unit-the-amx-block). The depiction of CPU-AMX bandwidth also [needs to be corrected](https://forums.macrumors.com/threads/apple-silicon-in-sciences.2374458/post-32031599), along with E-AMX performance.
 
@@ -149,6 +151,9 @@ Testing 10 different configurations - increments of 128 between 256 and 1408, re
 
 TODO: GPT-3.5 generated the code below. Use GPT-4 to generate the profiling tests. Use the same documentation practices as pioneered in [philipturner/applegpuinfo](https://github.com/philipturner/applegpuinfo).
 
+<details>
+<summary>Generated code</summary>
+
 ```swift
 // Command 1: Generate C code that calls into the BLAS library to perform the DGEMM operation.
 // Command 2: Translate what you just wrote to Swift.
@@ -184,6 +189,8 @@ for i in 0..<m {
     print("")
 }
 ```
+
+</details>
 
 | Operation | k<sub>real</sub> | M1 Max, OpenBLAS | M1 Max, Old BLAS | M1 Max, New BLAS | A15, Old BLAS | A15, New BLAS |
 | --------- | ---------------- | ---------------- | ---------------- | ---------------- | ------------- | ------------- |
