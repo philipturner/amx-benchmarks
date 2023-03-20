@@ -14,7 +14,7 @@ Table of Contents
 
 Hopefully this lets me run 10x more large-scale simulations, or the same number of simulations but vastly more complex. The intent is to generate enough data to train a neural network, or enable real-time reinforcement learning. This means I should not focus too much on optimizing the completion time of a single supermassive simulation. Rather, optimize latency when ~32 medium-sized simulations run on multiple CPU cores simultaneously.
 
-If a neural network can be trained, it might traverse a solution space more efficiently than brute force. This would boost performance much more than 10x. It also leads to another similar idea. The GPU can be harnessed for mixed-precision simulations (~1% FP64), with higher throughput but lower precision. After finding a few candidate nanostructures with promising results, validate them on the AMX with ~10% FP64. A final human validation can occur in 100% FP64.
+If a neural network can be trained, it might traverse a solution space more efficiently than brute force. This would boost performance much more than 10x. It also leads to another similar idea. The GPU can be harnessed for mixed-precision simulations (~1% FP64), with higher throughput but not catching ill-structured problems. After finding a few candidate nanostructures with promising results, validate them on the AMX with ~10% FP64. A final human validation can occur in 100% FP64.
 
 A good illustration might be this hierarchy:
 - Neural network: 50% FP16, 50% FP32, extremely high screening throughput
