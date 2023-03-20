@@ -147,7 +147,7 @@ TODO: Compare Apple's new BLAS library to the old BLAS library:
 
 Testing 10 different configurations - increments of 128 between 256 and 1408, reporting fastest speed / optimal matrix size. Speed reported in GFLOPS/k for real, GFLOPS/0.25k for complex. Eigendecompositions will use \_2stage with the new BLAS, unless the divide-and-conquer algorithm shows a performance delta. OpenBLAS is accessed through NumPy. That may put OpenBLAS at a slight disadvantage; Accelerate is accessed through lower-overhead Swift bindings.
 
-TODO: Use ChatGPT to generate the benchmarking code for me. So far it produced this which seems good. Hopefully don't need GPT-4 for the task.
+TODO: GPT-3.5 generated the code below. Use GPT-4 to generate the profiling tests. Use the same documentation practices as pioneered in [philipturner/applegpuinfo](https://github.com/philipturner/applegpuinfo).
 
 ```swift
 // Command 1: Generate C code that calls into the BLAS library to perform the DGEMM operation.
