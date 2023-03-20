@@ -20,7 +20,7 @@ If a neural network can be trained, it might traverse a solution space more effi
 
 A good illustration might be this hierarchy:
 - 3D neural network: 50% FP16, 50% FP32, extremely high screening throughput - O(n)
-- GPU DFT: 99-99.9% FP32, 0.1-1% FP64, high screening throughput - O(n^2) (memory-bound)
+- GPU DFT: 99-99.9% FP32, 0.1-1% FP64, high screening throughput - O(n^3)
 - AMX DFT: 80-90% FP32, 10-20% FP64, reduced screening throughput - O(n^3)
 - AMX DFT: 100% FP64, optimized for single-simulation latency - O(n^3)
 
