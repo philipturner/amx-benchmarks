@@ -1,15 +1,26 @@
 # AMX Benchmarks
 
-
-
 This repository is intended to coalesce data about real-world performance of the Apple AMX coprocessor. The end goal is to run quantum chemistry (DFT) simulations as fast as possible on Apple silicon. Therefore, the repository focuses on data types and performance parameters potentially useful toward the end goal. Relevant data types include FP64, FP32, and BF16.
 
 Table of Contents
 <!--
 - [Core Computing Unit](#core-computing-unit-the-amx-block)
 -->
+- [Motivation](#motivation)
 - [Linear Algebra Benchmark](#linear-algebra-benchmark-gflopsk)
 - [Related Work](#related-work)
+
+## Motivation
+
+Hopefully this lets me run 10x more large-scale simulations, or the same number of simulations but vastly more complex. The intent is to generate enough data to train a neural network, or enable real-time reinforcement learning. This means I should not focus too much on optimizing the completion time of a single supermassive simulation. Rather, optimize latency when ~32 medium-sized simulations run on multiple CPU cores simultaneously.
+
+If a neural network can be trained, it might traverse a solution space more efficiently than brute force. This would boost performance much more than 10x. It also leads to another similar idea. The GPU can be harnessed for mixed-precision simulations (~1% FP64), with higher throughput but lower precision. After finding a few candidate nanostructures with promising results, validate them on the AMX with ~10% FP64. A final human validation can occur in 100% FP64.
+
+A good illustration might be this hierarchy:
+- Neural network: 50% FP16, 50% FP32, extremely high screening throughput
+- GPU DFT: 99-99.9% FP32, 0.1-1% FP64, high screening throughput
+- AMX DFT: 50-90% FP32, 10-50% FP64, reduced screening throughput
+- AMX DFT: 100% FP64, not used for screening the solution space
 
 <!--
 
