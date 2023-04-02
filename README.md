@@ -11,14 +11,16 @@ Table of Contents
 
 Hopefully this lets me run 10x more large-scale simulations, or more complex simulations at the same throughput. The intent is to generate enough data to train a neural network, or enable real-time reinforcement learning. This means I should not focus too much on optimizing the completion time of a single supermassive simulation. Rather, optimize latency when ~32 medium-sized simulations run on multiple CPU cores simultaneously.
 
-If a neural network can be trained, it might traverse a solution space more efficiently\* than brute force. This would boost performance much more than 10x. According a [recent research paper (2023)](https://pubs.acs.org/doi/10.1021/acs.jctc.2c00983), the SCF iterations can be partitioned into stages with different precisions. The first iterations use single precision, while the last iterations use double precision. The researchers used a consumer RTX A4000 with 1:32 FP64:FP32 ratio and with negligible accuracy loss. For Apple silicon, the best adaptation of this algorithm would use CPU and GPU simultaneously. The AMX would not perform the majority of operations, but its presence it still important. Below is a tentative illustration of the scheme:
+If a neural network can be trained, it might traverse a solution space more efficiently\* than brute force. This would boost performance much more than 10x. According a [recent research paper (2023)](https://pubs.acs.org/doi/10.1021/acs.jctc.2c00983), the SCF iterations can be partitioned into stages with different precisions. The first iterations use single precision, while the last iterations use double precision. The researchers used a consumer RTX A4000 with 1:32 FP64:FP32 ratio and with negligible accuracy loss. For Apple silicon, the best adaptation of this algorithm would use CPU and GPU simultaneously. The AMX would not perform the majority of operations, but its presence it still important. Below is a tentative illustration\** of the scheme:
 
-- ~75% of iterations: GPU FP32 (GEMM) + GPU FP32 (ZHEEV)
-- ~10% of iterations: GPU FP32 (GEMM) + GPU double-single (ZHEEV)
-- ~10% of iterations: AMX FP32 (GEMM) + NEON FP64 (ZHEEV)
-- ~5% of iterations: AMX FP64 (GEMM) + NEON FP64 (ZHEEV)
+- ~75% of iterations: GPU FP32 (CHEMM) + GPU FP32 (CHEEV)
+- ~10% of iterations: GPU FP32 (CHEMM) + GPU double-single (CHEEV)
+- ~10% of iterations: AMX FP32 (CHEMM) + NEON FP64 (ZHEEV)
+- ~5% of iterations: AMX FP64 (ZHEMM) + NEON FP64 (ZHEEV)
 
 > \*Or generalize its knowledge to nanosystems so large, they take a day to validate through DFT.
+>
+> \**De-interleaving the complex multiplications (CHEMM, ZHEMM) into four separate multiplications of their real and complex parts (SGEMM, DGEMM). This improves ALU utilization with the AMX and `simdgroup_matrix`.
 
 ## Linear Algebra Benchmark: GFLOPS/k
 
