@@ -13,7 +13,7 @@ Hopefully this lets me run 10x more large-scale simulations, or more complex sim
 
 If a neural network can be trained, it might traverse a solution space more efficiently\* than brute force. This would boost performance much more than 10x. According a [recent research paper (2023)](https://pubs.acs.org/doi/10.1021/acs.jctc.2c00983), the SCF iterations can be partitioned into stages with different precisions. The first iterations use single precision, while the last iterations use double precision. The researchers used a consumer RTX A4000 with 1:32 FP64:FP32 ratio and with negligible accuracy loss. They achieved 6-8x speedup over GPU FP64, but did not utilize the FP64 compute power of the host CPU.
 
-For Apple silicon, the best adaptation of this algorithm would use CPU and GPU simultaneously. The AMX would not perform the majority of operations, but its presence it still important. Below is a tentative illustration\** of the scheme:
+For Apple silicon, the best adaptation of this algorithm would use CPU and GPU simultaneously. The AMX would not perform the majority of operations, but its presence would still be important. Below is a tentative illustration\** of the scheme:
 
 - ~75% of iterations: GPU FP32 (CHEMM) + GPU FP32 (CHEEV)
 - ~10% of iterations: GPU FP32 (CHEMM) + GPU double-single (CHEEV)
