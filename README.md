@@ -15,10 +15,10 @@ If a neural network can be trained, it might traverse a solution space more effi
 
 For Apple silicon, the best adaptation of this algorithm would use CPU and GPU simultaneously. The AMX would not perform the majority of operations, but its presence would still be important. Below is a tentative illustration\** of the scheme:
 
-- ~75% of iterations: GPU FP32 (CHEMM) + GPU FP32 (CHEEV)
-- ~10% of iterations: GPU FP32 (CHEMM) + GPU double-single (CHEEV)
-- ~10% of iterations: AMX FP32 (CHEMM) + NEON FP64 (ZHEEV)
-- ~5% of iterations: AMX FP64 (ZHEMM) + NEON FP64 (ZHEEV)
+- 75% of iterations: GPU FP32 (CHEMM) + GPU FP32 (CHEEV)
+- 10% of iterations: GPU FP32 (CHEMM) + GPU double-single (CHEEV)
+- 10% of iterations: AMX FP32 (CHEMM) + NEON FP64 (ZHEEV)
+- 5% of iterations: AMX FP64 (ZHEMM) + NEON FP64 (ZHEEV)
 
 > \*Or generalize its knowledge to nanosystems so large, they take a day to validate through DFT.
 >
