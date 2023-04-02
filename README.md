@@ -13,7 +13,7 @@ Hopefully this lets me run 10x more large-scale simulations, or more complex sim
 
 If a neural network can be trained, it might traverse a solution space more efficiently\* than brute force. This would boost performance much more than 10x. According a [recent research paper (2023)](https://pubs.acs.org/doi/10.1021/acs.jctc.2c00983), the SCF iterations can be partitioned into stages with different precisions. The first iterations use single precision, while the last iterations use double precision. The researchers used a consumer RTX A4000 with 1:32 FP64:FP32 ratio and with negligible accuracy loss. They achieved 6-8x speedup over GPU FP64. A host CPU was used for ZHEEV, but that operation only consumed 3-10% of the total time.
 
-For Apple silicon, the best adaptation of this algorithm would use CPU and GPU simultaneously. The AMX would not perform the majority of operations, but its presence would still be important. Below is a tentative illustration\** of the scheme:
+For Apple silicon, the best adaptation of this algorithm would use CPU and GPU simultaneously. The AMX would not perform the majority of operations, but its presence would still be important. Below is a tentative illustration of the scheme\**:
 
 - 65% of iterations: GPU FP32 (CHEMM) + GPU FP32 (CHEEV)
 - 15% of iterations: GPU FP32 (CHEMM) + GPU double-single (CHEEV)
@@ -22,7 +22,7 @@ For Apple silicon, the best adaptation of this algorithm would use CPU and GPU s
 
 > \*Or generalize its knowledge to nanosystems so large, they take a day to validate through DFT.
 >
-> \**De-interleaving the complex multiplications (CHEMM, ZHEMM) into four separate multiplications of their real and complex parts (SGEMM, DGEMM). This improves ALU utilization with the AMX and `simdgroup_matrix`.
+> \**De-interleaves the complex multiplications (CHEMM, ZHEMM) into four separate multiplications of their real and complex parts (SGEMM, DGEMM). This improves ALU utilization with the AMX and `simdgroup_matrix`.
 
 Using 75% of the performance cores' NEON, all of the AMX's FP64 GEMM compute, and all of the GPU's eFP64, the M1 Max could reach 1658 GFLOPS FP64. This is 4.3x faster than 100% of the performance cores' NEON alone and 2.8x faster than the GPU's eFP64 alone. However, using all of that simultaneously causes thermal throttling, decreasing performance by a factor of ~1.5x. The throttling doesn't cancel out the performance gains.
 
