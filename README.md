@@ -24,6 +24,8 @@ For Apple silicon, the best adaptation of this algorithm would use CPU and GPU s
 >
 > \**De-interleaving the complex multiplications (CHEMM, ZHEMM) into four separate multiplications of their real and complex parts (SGEMM, DGEMM). This improves ALU utilization with the AMX and `simdgroup_matrix`.
 
+Using 75% of the performance cores' NEON, all of the AMX's FP64 GEMM compute, and all of the GPU's eFP64, the M1 Max could reach 1658 GFLOPS FP64. This is 4.3x more than the CPU core's NEON alone and 2.8x faster than the GPU's eFP64 alone. However, using all of that simultaneously causes thermal throttling, decreasing performance by a factor of ~1.5x. The throttling doesn't cancel out the performance gains.
+
 ## Linear Algebra Benchmark: GFLOPS/k
 
 GFLOPS is not a plural noun. GFLOPS is a rate: (G)Billion (FL)Floating Point (OP)Operations per (S)Second. People sometimes say GFLOPS/second to clarify. That translates to GFLOP/second/second. Data throughput is a measure of speed. Speed requires units of velocity, not acceleration. GFLOPs is a plural noun. Occasionally, I use GFLOPs to specify the number of floating-point operations required for a linear algebra operation.  Pay close attention to the capitalization of `s`. Source code in this repository should use `numGFLOP(S|s)` to clarify the difference, while respecting the convention of camel case.
