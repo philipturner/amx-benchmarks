@@ -96,9 +96,9 @@ for i in 0..<m {
 
 | Operation | k<sub>real</sub> | M1 Max, OpenBLAS | M1 Max, New Accelerate | A15, New Accelerate | Max GFLOPS | Max ALU % |
 | --------- | ---------------- | ---------------- | ---------------- | ------------- | ---------- | ---------- |
-| SGEMM | 2 | | 1312.8 / 896 | 2625.6 | 84.5% |
-| DGEMM | 2 | | 283.4 / 768 | 566.8 | 72.9% |
-| ZGEMM | 2 | | 198.0 / 896 | 396.0 | 51.0% |
+| SGEMM | 2 | | 1312.8 / 896 | | 2625.6 | 84.5% |
+| DGEMM | 2 | | 283.4 / 768 | | 566.8 | 72.9% |
+| ZGEMM | 2 | | 198.0 / 896 | | 396.0 | 51.0% |
 | SSYEV (e-vecs) | n/a |
 | DSYEV (e-vecs) | n/a |
 | ZHEEV (e-vecs) | n/a |
