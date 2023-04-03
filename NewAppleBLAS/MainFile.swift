@@ -20,14 +20,17 @@ func mainFunc() {
   setenv("OMP_NUM_THREADS", "8", 0)
   setenv("OPENBLAS_NUM_THREADS", "8", 0)
   
+  // This actually works! Setting to 1 thread decreases GEMM performance.
+  setenv("VECLIB_MAXIMUM_THREADS", "8", 0)
+  
   // Run initial tests that everything works.
   boilerplateLikeCode()
   
   // define a constant for the number of repetitions
-  let REPS = 25
+  let REPS = 50
   
   // define a constant for the dimension
-  let N = 1024
+  let N = 512
   
   // define a function that takes two matrices and performs matrix multiplication on them
   // use generic parameters that conform to MatrixOperations protocol
