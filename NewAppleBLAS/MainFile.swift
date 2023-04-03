@@ -6,14 +6,21 @@
 //
 
 import Foundation
+#if os(macOS)
 import PythonKit
+#endif
 import RealModule
 import ComplexModule
 
 func mainFunc() {
-  PythonLibrary.useLibrary(at: "/Users/philipturner/miniforge3/bin/python")
+  #if os(macOS)
+  let downloadsURL = FileManager.default.urls(
+    for: .downloadsDirectory, in: .userDomainMask)[0]
+  let homePath = downloadsURL.deletingLastPathComponent().relativePath
+  PythonLibrary.useLibrary(at: homePath + "/miniforge3/bin/python")
   print(Python.version)
   print()
+  #endif
   
   // TODO: Query number of performance cores on machines besides Mx Pro/Max.
   setenv("NUM_THREADS", "8", 0)
@@ -78,19 +85,25 @@ func mainFunc() {
   let matrixFloat = Matrix<Float>(dimension: N, defaultValue: 0) // a Float matrix using Accelerate
   let matrixDouble = Matrix<Double>(dimension: N, defaultValue: 0) // a Double matrix using Accelerate
   let matrixComplex = Matrix<Complex<Double>>(dimension: N, defaultValue: 0) // a Complex<Double> matrix using Accelerate
+  #if os(macOS)
   let pythonMatrixFloat = PythonMatrix<Float>(dimension: N, defaultValue: 0) // a Float matrix using NumPy
   let pythonMatrixDouble = PythonMatrix<Double>(dimension: N, defaultValue: 0) // a Double matrix using NumPy
   let pythonMatrixComplex = PythonMatrix<Complex<Double>>(dimension: N, defaultValue: 0) // a Complex<Double> matrix using NumPy
+  #endif
   
   // create an array of matrices as type-erased wrappers
-  let matrices: [AnyMatrixOperations] = [
+  var matrices: [AnyMatrixOperations] = [
     AnyMatrixOperations(matrixFloat),
     AnyMatrixOperations(matrixDouble),
-    AnyMatrixOperations(matrixComplex),
+    AnyMatrixOperations(matrixComplex)
+  ]
+  #if os(macOS)
+  matrices += [
     AnyMatrixOperations(pythonMatrixFloat),
     AnyMatrixOperations(pythonMatrixDouble),
     AnyMatrixOperations(pythonMatrixComplex)
   ]
+  #endif
   
   // create a dictionary to store the minimum elapsed time for each function and data type combination
   var minElapsedTimes = [String : Double]()
@@ -216,6 +229,7 @@ func boilerplateLikeCode() {
     print(out)
   }
   
+  #if os(macOS)
   do {
     // create a 3x3 matrix of numbers with default value 0
     var m = PythonMatrix<Float>(dimension: 3, defaultValue: 0)
@@ -281,4 +295,5 @@ func boilerplateLikeCode() {
     m.matrixMultiply(by: m, into: &out)
     print(out)
   }
+  #endif
 }
