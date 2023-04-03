@@ -96,9 +96,9 @@ for i in 0..<m {
 
 | Operation | k<sub>real</sub> | M1 Max, OpenBLAS | M1 Max, Old BLAS | M1 Max, New BLAS | A15, Old BLAS | A15, New BLAS |
 | --------- | ---------------- | ---------------- | ---------------- | ---------------- | ------------- | ------------- |
-| SGEMM | 2 |
-| DGEMM | 2 |
-| ZGEMM | 2 |
+| SGEMM | 2 | | n/a | 1312.8 / 896 |
+| DGEMM | 2 | | n/a | 283.4 / 768 |
+| ZGEMM | 2 | | n/a | 198.0 / 896 |
 | SSYEV (e-vecs) | n/a |
 | DSYEV (e-vecs) | n/a |
 | ZHEEV (e-vecs) | n/a |
