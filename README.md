@@ -99,15 +99,18 @@ for i in 0..<m {
 | SGEMM | 2 |
 | DGEMM | 2 |
 | ZGEMM | 2 |
-| SSYMM | 2 |
-| DSYMM | 2 |
-| ZHEMM | 2 |
-| SSYEV (e-vals) | n/a |
-| DSYEV (e-vals) | n/a |
-| ZHEEV (e-vals) | n/a |
 | SSYEV (e-vecs) | n/a |
 | DSYEV (e-vecs) | n/a |
 | ZHEEV (e-vecs) | n/a |
+| SGESV | - |
+| DGESV | - |
+| ZGESV | - |
+| SPOTRF | - |
+| DPOTRF | - |
+| ZPOTRF | - |
+| STRSM | - |
+| DTRSM | - |
+| ZTRSM | - |
 
 ## Related Work
 
