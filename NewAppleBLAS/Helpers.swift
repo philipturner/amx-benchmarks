@@ -259,7 +259,7 @@ struct Matrix<T: LinearAlgebraScalar> {
 }
 
 
-
+#if os(macOS)
 // define a struct that represents a matrix using a PythonObject
 struct PythonMatrix<T: LinearAlgebraScalar & PythonConvertible & ConvertibleFromPython> {
   // the internal PythonObject that stores the matrix data
@@ -318,6 +318,7 @@ extension Complex<Double>: PythonConvertible & ConvertibleFromPython {
     Python.complex(self.real, self.imaginary)
   }
 }
+#endif
 
 // define a protocol that requires instance methods for matrix operations
 protocol MatrixOperations: CustomStringConvertible {
@@ -438,6 +439,7 @@ extension Matrix: MatrixOperations {
   }
 }
 
+#if os(macOS)
 // extend PythonMatrix to conform to MatrixOperations protocol
 extension PythonMatrix: MatrixOperations {
   var description: String {
@@ -476,3 +478,4 @@ extension PythonMatrix: MatrixOperations {
     // store the solution in the inout parameter
   }
 }
+#endif
