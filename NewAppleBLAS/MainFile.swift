@@ -20,12 +20,12 @@ func mainFunc() {
   PythonLibrary.useLibrary(at: homePath + "/miniforge3/bin/python")
   print(Python.version)
   print()
-  #endif
   
   // TODO: Query number of performance cores on machines besides Mx Pro/Max.
   setenv("NUM_THREADS", "8", 0)
   setenv("OMP_NUM_THREADS", "8", 0)
   setenv("OPENBLAS_NUM_THREADS", "8", 0)
+  #endif
   
   // This actually works! Setting to 1 thread decreases GEMM performance.
   setenv("VECLIB_MAXIMUM_THREADS", "8", 0)
@@ -50,7 +50,7 @@ func mainFunc() {
   // define a function that takes a matrix and performs eigenvalue decomposition on it
   // use a generic parameter that conforms to MatrixOperations protocol
   // use inout parameters for the eigenvalues and eigenvectors arrays
-  func eigenDecompose<T: MatrixOperations>(matrix: T, into values: inout [T.Scalar], vectors: inout T) {
+  func eigenDecompose<T: MatrixOperations>(matrix: T, into values: inout T.RealVector, vectors: inout T) {
     // perform eigenvalue decomposition using the protocol method
     matrix.eigenDecomposition(into: &values, vectors: &vectors)
   }
