@@ -84,17 +84,31 @@ fileprivate let np = Python.import("numpy")
 protocol LinearAlgebraScalar: Numeric {
   associatedtype PointerSelf
   associatedtype MutablePointerSelf
-  associatedtype MutablePointerReal
+  associatedtype RealType: LinearAlgebraScalar
   
   static var linearAlgebraFunctions: LinearAlgebraFunctions<Self> { get }
   
   static var one: Self { get }
 }
 
+#if os(macOS)
+protocol PythonLinearAlgebraScalar: LinearAlgebraScalar & PythonConvertible & ConvertibleFromPython where RealType: PythonLinearAlgebraScalar {
+  
+}
+
+extension Float: PythonLinearAlgebraScalar {}
+extension Double: PythonLinearAlgebraScalar {}
+extension Complex<Double>: PythonLinearAlgebraScalar {}
+#endif
+
+extension LinearAlgebraScalar {
+  typealias MutablePointerReal = UnsafeMutablePointer<RealType>
+}
+
 extension Float: LinearAlgebraScalar {
   typealias PointerSelf = UnsafePointer<Float>
   typealias MutablePointerSelf = UnsafeMutablePointer<Float>
-  typealias MutablePointerReal = UnsafeMutablePointer<Float>
+  typealias RealType = Float
   
   static let one: Float = 1
 }
@@ -102,7 +116,7 @@ extension Float: LinearAlgebraScalar {
 extension Double: LinearAlgebraScalar {
   typealias PointerSelf = UnsafePointer<Double>
   typealias MutablePointerSelf = UnsafeMutablePointer<Double>
-  typealias MutablePointerReal = UnsafeMutablePointer<Double>
+  typealias RealType = Double
   
   static let one: Double = 1
 }
@@ -110,7 +124,7 @@ extension Double: LinearAlgebraScalar {
 extension Complex<Double>: LinearAlgebraScalar {
   typealias PointerSelf = OpaquePointer
   typealias MutablePointerSelf = OpaquePointer
-  typealias MutablePointerReal = UnsafeMutablePointer<Double>
+  typealias RealType = Double
   
   static let one: Complex<Double> = .init(1, 0)
 }
@@ -148,24 +162,32 @@ struct LinearAlgebraFunctions<T: LinearAlgebraScalar> {
     UnsafePointer<__LAPACK_int>, T.MutablePointerSelf?,
     UnsafePointer<__LAPACK_int>) -> Void
   
+  typealias TRTTPFunction = (
+    UnsafePointer<CChar>, UnsafePointer<__LAPACK_int>, T.PointerSelf?,
+    UnsafePointer<__LAPACK_int>, T.MutablePointerSelf?,
+    UnsafeMutablePointer<__LAPACK_int>) -> Void
+  
   // define the properties that store the closures for each BLAS/LAPACK function
   let gemm: GEMMFunction
   let syev: SYEVFunction
   let gesv: GESVFunction
   let potrf: POTRFFunction
   let trsm: TRSMFunction
+  let trttp: TRTTPFunction
   
   // initialize the struct with the closures for each BLAS/LAPACK function
   init(gemm: @escaping GEMMFunction,
        syev: @escaping SYEVFunction,
        gesv: @escaping GESVFunction,
        potrf: @escaping POTRFFunction,
-       trsm: @escaping TRSMFunction) {
+       trsm: @escaping TRSMFunction,
+       trttp: @escaping TRTTPFunction) {
     self.gemm = gemm
     self.syev = syev
     self.gesv = gesv
     self.potrf = potrf
     self.trsm = trsm
+    self.trttp = trttp
   }
 }
 
@@ -202,7 +224,8 @@ extension Float {
       syev: wrap_syev(type: Float.self, ssyev_), // try ssyevd_, _2stage
       gesv: sgesv_,
       potrf: spotrf_,
-      trsm: strsm_)
+      trsm: strsm_,
+      trttp: strttp_)
   }
 }
 
@@ -214,7 +237,8 @@ extension Double {
       syev: wrap_syev(type: Double.self, dsyev_), // try dsyevd_, _2stage
       gesv: dgesv_,
       potrf: dpotrf_,
-      trsm: dtrsm_)
+      trsm: dtrsm_,
+      trttp: dtrttp_)
   }
 }
 
@@ -226,7 +250,8 @@ extension Complex where RealType == Double {
       syev: zheev_, // try zheevd_, _2stage
       gesv: zgesv_,
       potrf: zpotrf_,
-      trsm: ztrsm_)
+      trsm: ztrsm_,
+      trttp: ztrttp_)
   }
 }
 
@@ -258,12 +283,41 @@ struct Matrix<T: LinearAlgebraScalar> {
   }
 }
 
+// define a struct that represents a vector using a 1D array
+struct Vector<T: LinearAlgebraScalar> {
+  // the internal 1D array that stores the vector data
+  var storage: [T]
+  
+  // the dimension of the vector
+  let dimension: Int
+  
+  // initialize the vector with a given dimension and a default value
+  init(dimension: Int, defaultValue: T) {
+    self.dimension = dimension
+    self.storage = Array(repeating: defaultValue, count: dimension)
+  }
+  
+  // get or set the element at the given index
+  subscript(index: Int) -> T {
+    get {
+      precondition(index >= 0 && index < dimension, "Index out of range")
+      return storage[index]
+    }
+    set {
+      precondition(index >= 0 && index < dimension, "Index out of range")
+      storage[index] = newValue
+    }
+  }
+}
 
 #if os(macOS)
+//typealias PythonLinearAlgebraScalar =
+//  LinearAlgebraScalar & PythonConvertible & ConvertibleFromPython
+
 // define a struct that represents a matrix using a PythonObject
-struct PythonMatrix<T: LinearAlgebraScalar & PythonConvertible & ConvertibleFromPython> {
+struct PythonMatrix<T: PythonLinearAlgebraScalar> {
   // the internal PythonObject that stores the matrix data
-  private var storage: PythonObject
+  var storage: PythonObject
   
   // the dimension of the square matrix
   let dimension: Int
@@ -299,6 +353,37 @@ struct PythonMatrix<T: LinearAlgebraScalar & PythonConvertible & ConvertibleFrom
   }
 }
 
+// define a struct that represents a vector using a PythonObject
+struct PythonVector<T: PythonLinearAlgebraScalar> {
+  // the internal PythonObject that stores the vector data
+  private var storage: PythonObject
+  
+  // the dimension of the vector
+  let dimension: Int
+  
+  // initialize the vector with a given dimension and a default value
+  init(dimension: Int, defaultValue: T) {
+    self.dimension = dimension
+    // create a NumPy array with the default value and reshape it to a vector
+    let np = Python.import("numpy")
+    self.storage = np.full(dimension, defaultValue).reshape(dimension)
+  }
+  
+  // get or set the element at the given index
+  subscript(index: Int) -> T {
+    get {
+      precondition(index >= 0 && index < dimension, "Index out of range")
+      // use the subscript operator of the PythonObject to access the element
+      return T(storage[index])!
+    }
+    set {
+      precondition(index >= 0 && index < dimension, "Index out of range")
+      // use the subscript operator of the PythonObject to modify the element
+      storage[index] = newValue.pythonObject
+    }
+  }
+}
+
 extension Complex<Double>: PythonConvertible & ConvertibleFromPython {
   public init?(_ object: PythonKit.PythonObject) {
     guard let py_real = object.checking.real,
@@ -325,14 +410,27 @@ protocol MatrixOperations: CustomStringConvertible {
   // define the associated type for the scalar element
   associatedtype Scalar: LinearAlgebraScalar
   
+  // define the associated type for the vector element
+  associatedtype RealVector: VectorOperations where RealVector.Scalar == Scalar.RealType
+  
   // define the instance methods for matrix operations
   // use descriptive names that indicate the corresponding BLAS/LAPACK function
   // use inout parameters for the return values
   func matrixMultiply(by other: Self, into result: inout Self) // corresponds to GEMM
-  func eigenDecomposition(into values: inout [Scalar], vectors: inout Self) // corresponds to SYEV
+  func eigenDecomposition(into values: inout RealVector, vectors: inout Self) // corresponds to SYEV
   func solveLinearSystem(with rhs: Self, into solution: inout Self) // corresponds to GESV
   func choleskyFactorization(into factor: inout Self) // corresponds to POTRF
   func triangularSolve(with rhs: Self, into solution: inout Self) // corresponds to TRSM
+  
+  var dimension: Int { get }
+  
+  // "Matrix \(dataType) \(library)"
+  var description: String { get }
+}
+
+protocol VectorOperations: CustomStringConvertible {
+  // define the associated type for the scalar element
+  associatedtype Scalar: LinearAlgebraScalar
   
   var dimension: Int { get }
   
@@ -374,8 +472,40 @@ func checkDimensions<
   checkDimensions(lhs, rhs)
 }
 
+func checkDimensions<
+  T: MatrixOperations, U: VectorOperations, V: MatrixOperations
+>(
+  _ lhs: T, _ mhs: U, _ rhs: V
+) {
+  precondition(
+    lhs.dimension == mhs.dimension,
+    "Incompatible dimensions: lhs (\(lhs.dimension)) != rhs (\(mhs.dimension))")
+  precondition(
+    lhs.dimension == rhs.dimension,
+    "Incompatible dimensions: lhs (\(lhs.dimension)) != rhs (\(rhs.dimension))")
+}
+
+func checkLAPACKError(
+  _ error: Int,
+  _ file: StaticString = #file,
+  _ line: UInt = #line
+) {
+  if _slowPath(error != 0) {
+    let message = """
+      Found LAPACK error in \(file):\(line):
+      Error code = \(error)
+      """
+    print(message)
+    fatalError(message, file: file, line: line)
+  }
+}
+
 // extend Matrix to conform to MatrixOperations protocol
 extension Matrix: MatrixOperations {
+  typealias Scalar = T
+  
+  typealias RealVector = Vector<T.RealType>
+  
   var description: String {
     if Scalar.self == Complex<Double>.self {
       return "Matrix Complex Accelerate"
@@ -415,12 +545,48 @@ extension Matrix: MatrixOperations {
         }
       }
     }
-    
   }
   
-  func eigenDecomposition(into values: inout [T], vectors: inout Matrix<T>) {
+  func eigenDecomposition(into values: inout RealVector, vectors: inout Matrix<T>) {
     // implement eigenvalue decomposition using BLAS/LAPACK functions
     // store the values and vectors in the inout parameters
+    checkDimensions(self, values, vectors)
+    
+    // First copy the input to the output in packed format, then overwrite the
+    // output with eigendecomposition.
+    var dim: Int = self.dimension
+    var error: Int = 0
+    self.storage.withUnsafeBufferPointer { pointerA in
+      let A = unsafeBitCast(pointerA.baseAddress, to: T.PointerSelf?.self)
+      
+      vectors.storage.withUnsafeMutableBufferPointer { pointerAP in
+        let AP = unsafeBitCast(pointerAP.baseAddress, to: T.MutablePointerSelf?.self)
+        
+        Scalar.linearAlgebraFunctions.trttp("U", &dim, A, &dim, AP, &error)
+        checkLAPACKError(error)
+      }
+    }
+    
+    var rwork = [T](repeating: 0, count: max(1, 3 * dim - 2))
+    values.storage.withUnsafeMutableBufferPointer { pointerW in
+      let W = pointerW.baseAddress
+      
+      vectors.storage.withUnsafeMutableBufferPointer { pointerAP in
+        let AP = unsafeBitCast(pointerAP.baseAddress, to: T.MutablePointerSelf?.self)
+        
+        rwork.withUnsafeMutableBufferPointer { pointerRWORK in
+          let RWORK = unsafeBitCast(pointerRWORK.baseAddress, to: T.MutablePointerSelf.self)
+          
+          var lworkSize: Int = 0
+          Scalar.linearAlgebraFunctions.syev(
+            "V", "N", &dim, AP, &dim, W,
+            RWORK /* nothing else to put here? */, &lworkSize, nil, &error)
+          checkLAPACKError(error)
+          
+          // TODO: Finish the eigendecomposition operation.
+        }
+      }
+    }
   }
   
   func solveLinearSystem(with rhs: Matrix<T>, into solution: inout Matrix<T>) {
@@ -439,9 +605,25 @@ extension Matrix: MatrixOperations {
   }
 }
 
+extension Vector: VectorOperations {
+  typealias Scalar = T
+  
+  var description: String {
+    if Scalar.self == Complex<Double>.self {
+      return "Vector Complex Accelerate"
+    } else {
+      return "Vector \(Scalar.self) Accelerate"
+    }
+  }
+}
+
 #if os(macOS)
 // extend PythonMatrix to conform to MatrixOperations protocol
 extension PythonMatrix: MatrixOperations {
+  typealias Scalar = T
+  
+  typealias RealVector = PythonVector<T.RealType>
+  
   var description: String {
     if Scalar.self == Complex<Double>.self {
       return "Matrix Complex OpenBLAS"
@@ -458,7 +640,7 @@ extension PythonMatrix: MatrixOperations {
     np.matmul(self.storage, other.storage, out: result.storage)
   }
   
-  func eigenDecomposition(into values: inout [T], vectors: inout PythonMatrix<T>) {
+  func eigenDecomposition(into values: inout RealVector, vectors: inout PythonMatrix<T>) {
     // implement eigenvalue decomposition using NumPy functions
     // store the values and vectors in the inout parameters
   }
@@ -476,6 +658,18 @@ extension PythonMatrix: MatrixOperations {
   func triangularSolve(with rhs: PythonMatrix<T>, into solution: inout PythonMatrix<T>) {
     // implement triangular solver using NumPy functions
     // store the solution in the inout parameter
+  }
+}
+
+extension PythonVector: VectorOperations {
+  typealias Scalar = T
+  
+  var description: String {
+    if Scalar.self == Complex<Double>.self {
+      return "Vector Complex OpenBLAS"
+    } else {
+      return "Vector \(Scalar.self) OpenBLAS"
+    }
   }
 }
 #endif
