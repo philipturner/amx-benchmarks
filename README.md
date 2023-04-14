@@ -1,6 +1,6 @@
 # AMX Benchmarks
 
-This document coalesces data about real-world performance of the Apple AMX coprocessor. The motivating use case is electronic structure calculations (DFT simulations), which use complex-valued matrix multiplications and eigendecompositions. Interleaved complex numbers incur additional overhead compared to split complex numbers, but BLAS only accepts the interleaved format. This fact harms performance on both NEON and AMX units, but AMX to a greater extent.
+This document coalesces data about real-world performance of the Apple AMX coprocessor. The motivating use case is electronic structure calculations (DFT simulations), which use complex-valued matrix multiplications and eigendecompositions. Interleaved complex numbers incur additional overhead compared to split complex numbers, but BLAS only accepts the interleaved format. This format underutilizes both NEON and AMX units, but AMX to a greater extent.
 
 Table of Contents
 - [Motivation](#motivation)
