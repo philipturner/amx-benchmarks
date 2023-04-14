@@ -22,7 +22,7 @@ For Apple silicon, the best adaptation of this algorithm would use CPU and GPU s
 
 > \*De-interleaves the complex multiplications (CHEMM, ZHEMM) into four separate multiplications of their real and complex parts (SGEMM, DGEMM). This improves ALU utilization with the AMX and `simdgroup_matrix`.
 
-Using 75% of the performance cores' NEON, all of the AMX's FP64 GEMM compute, and all of the GPU's eFP64, the M1 Max could reach 1658 GFLOPS FP64. This is 4.3x faster than 100% of the performance cores' NEON alone and 2.8x faster than the GPU's eFP64 alone. However, using all of that simultaneously causes thermal throttling, decreasing performance by a factor of ~1.5x. The throttling doesn't cancel out the performance gains.
+Using 75% of the performance cores' NEON, all of the AMX's FP64 GEMM compute, and all of the GPU's eFP64, the M1 Max could reach 1658 GFLOPS FP64. This is 4.3x faster than 100% of the performance cores' NEON alone and 2.8x faster than the GPU's eFP64 alone. However, using all of that simultaneously may cause thermal throttling, decreasing performance by up to 1.5x.
 
 ## Linear Algebra Benchmark: GFLOPS/k
 
