@@ -1,6 +1,6 @@
 # AMX Benchmarks
 
-This repository is intended to coalesce data about real-world performance of the Apple AMX coprocessor. The end goal is to run quantum chemistry (DFT) simulations as fast as possible on Apple silicon. Therefore, the repository focuses on data types and performance parameters potentially useful toward the end goal. Relevant data types include FP64, FP32, and BF16.
+This document coalesces data about real-world performance of the Apple AMX coprocessor. The motivating use case is electronic structure calculations (DFT simulations), which use complex-valued matrix multiplications and eigendecompositions. Interleaved complex numbers incur additional overhead compared to split complex numbers, but BLAS only accepts the interleaved format. This fact harms performance on both NEON and AMX units, but AMX to a greater extent.
 
 Table of Contents
 - [Motivation](#motivation)
@@ -26,7 +26,9 @@ Using 75% of the performance cores' NEON, all of the AMX's FP64 GEMM compute, an
 
 ## Linear Algebra Benchmark: GFLOPS/k
 
-GFLOPS is not a plural noun. GFLOPS is a rate: (G)Billion (FL)Floating Point (OP)Operations per (S)Second. People sometimes say GFLOPS/second to clarify. That translates to GFLOP/second/second. Data throughput is a measure of speed. Speed requires units of velocity, not acceleration. GFLOPs is a plural noun. Occasionally, I use GFLOPs to specify the number of floating-point operations required for a linear algebra operation.  Pay close attention to the capitalization of `s`. Source code in this repository should use `numGFLOP(S|s)` to clarify the difference, while respecting the convention of camel case.
+GFLOPS is not a plural noun. GFLOPS is a rate: (G)Billion (FL)Floating Point (OP)Operations per (S)Second. The term GFLOPS/second is often used to remove ambiguity, except that translates to GFLOP/second/second. Data throughput is a measure of speed - speed requires units of velocity, not acceleration. Therefore, this repository uses the original term GFLOPS.
+
+GFLOPs is a plural noun. Occasionally, I use GFLOPs to specify the number of floating-point operations required for a linear algebra operation. The capitalization of `s` will distinguish the metric from GFLOPS. There are not many other concise, consistent ways to describe both of these terms.
 
 TODO: Explain O(kn^3), uncertainty in computational complexity, universal measure of time-to-solution (agnostic of precision or algorithm), visualize GFLOPS/k like the slope of a line, GFLOPS/0.25k for complex-valued operations to normalize for ALU utilization
 
