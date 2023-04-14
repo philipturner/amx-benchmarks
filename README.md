@@ -30,7 +30,7 @@ GFLOPS is not a plural noun. GFLOPS is a rate: (G)Billion (FL)Floating Point (OP
 
 GFLOPs is a plural noun. Occasionally, I use GFLOPs to specify the number of floating-point operations required for a linear algebra operation. The capitalization of `s` will distinguish the metric from GFLOPS. There are not many other concise, consistent ways to describe both of these terms.
 
-TODO: Explain O(kn^3), uncertainty in computational complexity, universal measure of time-to-solution (agnostic of precision or algorithm), visualize GFLOPS/k like the slope of a line, GFLOPS/0.25k for complex-valued operations to normalize for ALU utilization
+TODO: Explain O(kn^3), uncertainty in computational complexity, universal measure of time-to-solution (agnostic of precision or algorithm), why I used GFLOPS/0.25k for complex-valued operations to normalize for ALU utilization
 
 ```
 Real:    GFLOPS = GFLOPS/k * k_real
@@ -43,11 +43,11 @@ k_real = 0.25k_complex
 TODO: Compare Apple's new BLAS library to the old BLAS library:
 - sgemm, dgemm, zgemm
 - ssymm, dsymm, zhemm
-- ssyev, dsyev, zheev, faster \_2stage approaches added to the new LAPACK library
+- ssyev, dsyev, zheev, newer \_2stage approaches added to the newer Accelerate
 - xcholesky, xpotrf, xtrsm
 - appleblas_xgeadd added to the new LAPACK library
 
-Testing 10 different configurations - increments of 128 between 256 and 1408, reporting fastest speed / optimal matrix size. Speed reported in GFLOPS/k for real, GFLOPS/0.25k for complex. Eigendecompositions will use \_2stage with the new BLAS, unless the divide-and-conquer algorithm shows a performance delta. OpenBLAS is accessed through NumPy. That may put OpenBLAS at a slight disadvantage; Accelerate is accessed through lower-overhead Swift bindings.
+<!-- Testing 10 different configurations - increments of 128 between 256 and 1408, reporting fastest speed / optimal matrix size. Speed reported in GFLOPS/k for real, GFLOPS/0.25k for complex. Eigendecompositions will use \_2stage with the new BLAS, unless the divide-and-conquer algorithm shows a performance delta. OpenBLAS is accessed through NumPy. That may put OpenBLAS at a slight disadvantage; Accelerate is accessed through lower-overhead Swift bindings. -->
 
 <!--
 TODO: GPT-3.5 generated the code below. Use GPT-4 to generate the profiling tests. Use the same documentation practices as pioneered in [philipturner/applegpuinfo](https://github.com/philipturner/applegpuinfo).
