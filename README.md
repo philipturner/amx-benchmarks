@@ -118,6 +118,8 @@ for i in 0..<m {
 | DTRSM | - |
 | ZTRSM | - |
 
+_GFLOPS/k for each operation used in quantum chemistry. This metric compares each operation's execution speed regardless of the algorithm used to perform it, or the formula used to estimate GFLOPS. Complex-valued operations use GFLOPS/0.25k to directly compare ALU utilization to real-valued operations. For every operation listed so far, complex-valued versions are slower because they must de-interleave the numbers before processing them._
+
 ## Related Work
 
 | | ISA Documentation | Performance Documentation | OSS GEMM Libraries |
