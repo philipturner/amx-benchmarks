@@ -24,7 +24,7 @@ For Apple silicon, the best adaptation of this algorithm would use CPU and GPU s
 
 Using 75% of the performance cores' NEON, all of the AMX's FP64 GEMM compute, and all of the GPU's eFP64, the M1 Max could reach 1658 GFLOPS FP64. This is 4.3x faster than 100% of the performance cores' NEON alone and 2.8x faster than the GPU's eFP64 alone. However, using all of that simultaneously may cause thermal throttling, decreasing performance by up to 1.5x.
 
-In another scheme, the AMX would perform most of the operations. Matrix sizes used for GEMM exceed the matrix sizes used for ZHEEV. ZHEEV is kn^3, where n is the number of valence electrons. Meanwhile, GEMM is kLn^2, where L is the number of lattice spacings. There are significantly more lattice spacings than valence electrons, by multiple orders of magnitude.
+In another scheme, the AMX would perform most of the computations. Matrix sizes used for GEMM exceed the matrix sizes used for ZHEEV. ZHEEV is kn^3, where n is the number of valence electrons. Meanwhile, GEMM is kLn^2, where L is the number of lattice spacings. There are significantly more lattice spacings than valence electrons, by multiple orders of magnitude.
 
 - 65% of iterations: AMX FP32 (CHEMM) + NEON FP32 (CHEEV)
 - 30% of iterations: AMX FP32 (CHEMM) + NEON FP64 (ZHEEV)
