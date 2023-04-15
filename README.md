@@ -26,8 +26,8 @@ Using 75% of the performance cores' NEON, all of the AMX's FP64 GEMM compute, an
 
 In another scheme, the AMX would perform most of the computations. Matrix sizes used for GEMM exceed the matrix sizes used for ZHEEV. ZHEEV is kn^3, where n is the number of valence electrons. Meanwhile, GEMM is kLn^2, where L is the number of lattice spacings. There are significantly more lattice spacings than valence electrons, by multiple orders of magnitude.
 
-- 65% of iterations: AMX FP32 (CHEMM) + NEON FP32 (CHEEV)
-- 30% of iterations: AMX FP32 (CHEMM) + NEON FP64 (ZHEEV)
+- 80% of iterations: AMX FP32 (CHEMM) + NEON FP32 (CHEEV)
+- 15% of iterations: AMX FP32 (CHEMM) + NEON FP64 (ZHEEV)
 - 5% of iterations: AMX FP64 (ZHEMM) + NEON FP64 (ZHEEV)
 
 ## Linear Algebra Benchmark: GFLOPS/k
