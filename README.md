@@ -39,11 +39,23 @@ GFLOPs is a plural noun. Occasionally, I use GFLOPs to specify the number of flo
 TODO: Explain O(kn^3), uncertainty in computational complexity, universal measure of time-to-solution (agnostic of precision or algorithm), why I used GFLOPS/0.25k for complex-valued operations to normalize for ALU utilization
 
 ```
-Real:    GFLOPS = GFLOPS/k * k_real
-Complex: GFLOPS = GFLOPS/0.25k * 0.25k_complex
+GFLOPS/k = (matrix dimension)^3 / (time to solution)
+Imagine a processor has 1000 GFLOPS, uses 10 watts.
+OpenBLAS GEMM: real GLOPS/k = 800, but complex GFLOPS/k = 190
+Real has 80% ALU / 8.0 watts.
+Complex has 76% ALU / 7.6 watts, not 19% ALU / 1.9 watts.
+Both operations have ~80% ALU and ~8 watts.
+
+However, GFLOPS/0.25k = 4 * (GFLOPS/k) ~ 760
+80% ALU is much closer to 76%, and shows that complex is 4% slower,
+but not because it requires more computations.
+GFLOPS/0.25k is a fairer, more insightful comparison.
 
 k_complex = 4k_real
 k_real = 0.25k_complex
+
+Real:    GFLOPS = GFLOPS/k * k_real
+Complex: GFLOPS = GFLOPS/0.25k * 0.25k_complex
 ```
 
 TODO: Compare Apple's new BLAS library to the old BLAS library:
