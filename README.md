@@ -48,7 +48,8 @@ Both operations have ~80% ALU and ~8 watts.
 
 However, GFLOPS/0.25k = 4 * (GFLOPS/k) ~ 760
 80% ALU is much closer to 76%, and shows that complex is 4% slower,
-but not because it requires more computations.
+but not because it requires more computations. Also, you would think 
+it's 4% **faster**, because it has **more** arithmetic intensity.
 GFLOPS/0.25k is a fairer, more insightful comparison.
 
 k_complex = 4k_real
