@@ -35,12 +35,12 @@ New scheme:
 |                                  | AMX Vector | NEON Vector | GPU Matrix | GPU Vector | AMX Matrix |
 | -------------------------------- | ---------- | ----------- | ---------- | ---------- | ---------- |
 | Max Clock @ Full Utilization     | 3.228 GHz  | 3.132 GHz   | 1.296 GHz  | 1.296 GHz  | 3.228 GHz  |
-| Max Observed Power               | TBD        | 43.9 W      | TBD        | 51.1 W     | TBD        |
+| Max Observed Power               | ~12 W ???  | 43.9 W      | 42 W       | 51.1 W     | ~12 W ???  |
 | Max Observed GFLOPS F32          | TBD        | 655         | 8435       | 10400      | 2746       |
 | Max Observed GFLOPS F64          | TBD        | 352         | 0          | 0          | 700        |
 | Max Theoretical GFLOPS FFMA32    | 413        | 801         | 8493       | 10617      | 3305       |
-| Max Theoretical GFLOPS FDIV32    | 413        | 200         | 0          | 1769       | 0          |
-| Max Theoretical GFLOPS FSQRT32   | 413        | 200         | 0          | 1327       | 0          |
+| Max Theoretical GFLOPS FDIV32    | 0          | 200         | 0          | 1769       | 0          |
+| Max Theoretical GFLOPS FSQRT32   | 0          | 200         | 0          | 1327       | 0          |
 | Max Theoretical GFLOPS (e)FFMA64 | 206        | 400         | TBD        | 589        | 826        |
 | Max Theoretical GFLOPS (e)FDIV64 | 0          | 100         | 0          | 183        | 0          |
 | Max Theoretical GFLOPS (e)FSQRT64 | 0         | 100         | 0          | 189        | 0          |
