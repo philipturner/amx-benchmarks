@@ -88,7 +88,7 @@ Non-hybrid algorithms (all on one processor, either the CPU cores, AMX units, or
 
 | Operation | k<sub>real</sub> | OpenBLAS GFLOPS/k | Accelerate GFLOPS/k | Metal GFLOPS/k | NEON % | AMX % | GPU % | Max GFLOPS |
 | --------- | ---------------- | -------- | ---------- | ----- | ---------- | --------- | --------- | ---------- |
-| SGEMM | 2 | 327.7 | 1327.4 | 4629.0 | 84.4% | 85.4% | 87.2% | 9258.0 | 
+| SGEMM | 2 | 362.2 | 1327.4 | 4629.0 | 84.4% | 85.4% | 87.2% | 9258.0 | 
 | DGEMM | 2 | 176.2 | 337.9  | -      | 90.7% | 87.0% | -     | 675.8  | 
 | ZGEMM | 2 | 148.4 | 223.6  | -      | 76.4% | 57.6% | -     | 447.2  | 
 | SSYEV (e-vecs) | n/a |
