@@ -86,7 +86,7 @@ TODO: Add custom implementations using the GPU
 
 Non-hybrid algorithms (all on one processor, either the CPU cores, AMX units, or GPU cores)
 
-| Operation | k<sub>real</sub> | OpenBLAS GFLOPS/k | Accelerate GFLOPS/k | Metal GFLOPS/k | NEON ALU % | AMX ALU % | GPU ALU % | Max GFLOPS |
+| Operation | k<sub>real</sub> | OpenBLAS GFLOPS/k | Accelerate GFLOPS/k | Metal GFLOPS/k | NEON % | AMX % | GPU % | Max GFLOPS |
 | --------- | ---------------- | -------- | ---------- | ----- | ---------- | --------- | --------- | ---------- |
 | SGEMM | 2 | 327.7 | 1327.4 | 4629.0 | 84.4% | 85.4% | 87.2% | 9258.0 | 
 | DGEMM | 2 | 176.2 | 337.9  | -      | 90.7% | 87.0% | -     | 675.8  | 
