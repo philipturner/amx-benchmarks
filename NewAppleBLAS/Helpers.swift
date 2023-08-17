@@ -140,16 +140,31 @@ struct LinearAlgebraFunctions<T: LinearAlgebraScalar> {
     UnsafePointer<__LAPACK_int>) -> Void
   
   typealias SYEVFunction = (
-    UnsafePointer<CChar>, UnsafePointer<CChar>, UnsafePointer<__LAPACK_int>,
-    T.MutablePointerSelf?, UnsafePointer<__LAPACK_int>, T.MutablePointerReal?,
-    T.MutablePointerSelf, UnsafePointer<__LAPACK_int>, T.MutablePointerReal?,
-    UnsafeMutablePointer<__LAPACK_int>) -> Void
+    _ JOBZ: UnsafePointer<CChar>,
+    _ UPLO: UnsafePointer<CChar>,
+    _ N: UnsafePointer<__LAPACK_int>,
+    _ A: T.MutablePointerSelf?,
+    _ LDA: UnsafePointer<__LAPACK_int>,
+    _ W: T.MutablePointerReal?,
+    _ WORK: T.MutablePointerSelf,
+    _ LWORK: UnsafePointer<__LAPACK_int>,
+    _ RWORK: T.MutablePointerReal?,
+    _ INFO: UnsafeMutablePointer<__LAPACK_int>) -> Void
   
-  typealias GESVFunction = (
-    UnsafePointer<__LAPACK_int>, UnsafePointer<__LAPACK_int>,
-    T.MutablePointerSelf, UnsafePointer<__LAPACK_int>,
-    UnsafeMutablePointer<__LAPACK_int>?, T.MutablePointerSelf?,
-    UnsafePointer<__LAPACK_int>, UnsafeMutablePointer<__LAPACK_int>) -> Void
+  typealias SYEVDFunction = (
+    _ JOBZ: UnsafePointer<CChar>,
+    _ UPLO: UnsafePointer<CChar>,
+    _ N: UnsafePointer<__LAPACK_int>,
+    _ A: T.MutablePointerSelf?,
+    _ LDA: UnsafePointer<__LAPACK_int>,
+    _ W: T.MutablePointerReal?,
+    _ WORK: T.MutablePointerSelf,
+    _ LWORK: UnsafePointer<__LAPACK_int>,
+    _ RWORK: T.MutablePointerReal?,
+    _ LRWORK: UnsafePointer<__LAPACK_int>,
+    _ IWORK: UnsafeMutablePointer<Int>,
+    _ LIWORK: UnsafePointer<__LAPACK_int>,
+    _ INFO: UnsafeMutablePointer<__LAPACK_int>) -> Void
   
   typealias POTRFFunction = (
     UnsafePointer<CChar>, UnsafePointer<__LAPACK_int>, T.MutablePointerSelf?,
@@ -170,7 +185,7 @@ struct LinearAlgebraFunctions<T: LinearAlgebraScalar> {
   // define the properties that store the closures for each BLAS/LAPACK function
   let gemm: GEMMFunction
   let syev: SYEVFunction
-  let gesv: GESVFunction
+  let syevd: SYEVDFunction
   let potrf: POTRFFunction
   let trsm: TRSMFunction
   let trttp: TRTTPFunction
@@ -178,13 +193,13 @@ struct LinearAlgebraFunctions<T: LinearAlgebraScalar> {
   // initialize the struct with the closures for each BLAS/LAPACK function
   init(gemm: @escaping GEMMFunction,
        syev: @escaping SYEVFunction,
-       gesv: @escaping GESVFunction,
+       syevd: @escaping SYEVDFunction,
        potrf: @escaping POTRFFunction,
        trsm: @escaping TRSMFunction,
        trttp: @escaping TRTTPFunction) {
     self.gemm = gemm
     self.syev = syev
-    self.gesv = gesv
+    self.syevd = syevd
     self.potrf = potrf
     self.trsm = trsm
     self.trttp = trttp
@@ -195,25 +210,42 @@ struct LinearAlgebraFunctions<T: LinearAlgebraScalar> {
 func wrap_syev<T: LinearAlgebraScalar>(
   type: T.Type,
   _ syev: @escaping (
-    UnsafePointer<CChar>, UnsafePointer<CChar>, UnsafePointer<__LAPACK_int>,
-    T.MutablePointerSelf?, UnsafePointer<__LAPACK_int>, T.MutablePointerReal?,
-    T.MutablePointerSelf, UnsafePointer<__LAPACK_int>,
-    UnsafeMutablePointer<__LAPACK_int>
+    _ JOBZ: UnsafePointer<CChar>,
+    _ UPLO: UnsafePointer<CChar>,
+    _ N: UnsafePointer<__LAPACK_int>,
+    _ A: T.MutablePointerSelf?,
+    _ LDA: UnsafePointer<__LAPACK_int>,
+    _ W: T.MutablePointerReal?,
+    _ WORK: T.MutablePointerSelf,
+    _ LWORK: UnsafePointer<__LAPACK_int>,
+    _ INFO: UnsafeMutablePointer<__LAPACK_int>
   ) -> Void
-) -> (
-  UnsafePointer<CChar>, UnsafePointer<CChar>, UnsafePointer<__LAPACK_int>,
-  T.MutablePointerSelf?, UnsafePointer<__LAPACK_int>, T.MutablePointerReal?,
-  T.MutablePointerSelf, UnsafePointer<__LAPACK_int>, T.MutablePointerReal?,
-  UnsafeMutablePointer<__LAPACK_int>
-) -> Void {
+) -> LinearAlgebraFunctions<T>.SYEVFunction {
   return {
     return syev($0, $1, $2, $3, $4, $5, $6, $7, $9)
-  } as (
-    UnsafePointer<CChar>, UnsafePointer<CChar>, UnsafePointer<__LAPACK_int>,
-    T.MutablePointerSelf?, UnsafePointer<__LAPACK_int>, T.MutablePointerReal?,
-    T.MutablePointerSelf, UnsafePointer<__LAPACK_int>, T.MutablePointerReal?,
-    UnsafeMutablePointer<__LAPACK_int>
+  } as LinearAlgebraFunctions<T>.SYEVFunction
+}
+
+@inline(__always)
+func wrap_syevd<T: LinearAlgebraScalar>(
+  type: T.Type,
+  _ syev: @escaping (
+    _ JOBZ: UnsafePointer<CChar>,
+    _ UPLO: UnsafePointer<CChar>,
+    _ N: UnsafePointer<__LAPACK_int>,
+    _ A: T.MutablePointerSelf?,
+    _ LDA: UnsafePointer<__LAPACK_int>,
+    _ W: T.MutablePointerReal?,
+    _ WORK: T.MutablePointerSelf,
+    _ LWORK: UnsafePointer<__LAPACK_int>,
+    _ IWORK: UnsafeMutablePointer<Int>,
+    _ LIWORK: UnsafePointer<__LAPACK_int>,
+    _ INFO: UnsafeMutablePointer<__LAPACK_int>
   ) -> Void
+) -> LinearAlgebraFunctions<T>.SYEVDFunction {
+  return {
+    return syev($0, $1, $2, $3, $4, $5, $6, $7, $10, $11, $12)
+  } as LinearAlgebraFunctions<T>.SYEVDFunction
 }
 
 // extend Float to store a static variable that returns the set of BLAS/LAPACK functions for Float
@@ -221,8 +253,8 @@ extension Float {
   static var linearAlgebraFunctions: LinearAlgebraFunctions<Float> {
     return LinearAlgebraFunctions<Float>(
       gemm: sgemm_,
-      syev: wrap_syev(type: Float.self, ssyev_), // try ssyevd_, _2stage
-      gesv: sgesv_,
+      syev: wrap_syev(type: Float.self, ssyev_),
+      syevd: wrap_syevd(type: Float.self, ssyevd_),
       potrf: spotrf_,
       trsm: strsm_,
       trttp: strttp_)
@@ -234,8 +266,8 @@ extension Double {
   static var linearAlgebraFunctions: LinearAlgebraFunctions<Double> {
     return LinearAlgebraFunctions<Double>(
       gemm: dgemm_,
-      syev: wrap_syev(type: Double.self, dsyev_), // try dsyevd_, _2stage
-      gesv: dgesv_,
+      syev: wrap_syev(type: Double.self, dsyev_),
+      syevd: wrap_syevd(type: Double.self, dsyevd_),
       potrf: dpotrf_,
       trsm: dtrsm_,
       trttp: dtrttp_)
@@ -247,8 +279,8 @@ extension Complex where RealType == Double {
   static var linearAlgebraFunctions: LinearAlgebraFunctions<Complex<Double>> {
     return LinearAlgebraFunctions<Complex<Double>>(
       gemm: zgemm_,
-      syev: zheev_, // try zheevd_, _2stage
-      gesv: zgesv_,
+      syev: zheev_,
+      syevd: zheevd_,
       potrf: zpotrf_,
       trsm: ztrsm_,
       trttp: ztrttp_)
@@ -356,7 +388,7 @@ struct PythonMatrix<T: PythonLinearAlgebraScalar> {
 // define a struct that represents a vector using a PythonObject
 struct PythonVector<T: PythonLinearAlgebraScalar> {
   // the internal PythonObject that stores the vector data
-  private var storage: PythonObject
+  var storage: PythonObject
   
   // the dimension of the vector
   let dimension: Int
@@ -426,6 +458,10 @@ protocol MatrixOperations: CustomStringConvertible {
   
   // "Matrix \(dataType) \(library)"
   var description: String { get }
+  
+  subscript(row: Int, column: Int) -> Scalar { get set }
+  
+  init(dimension: Int, defaultValue: Scalar)
 }
 
 protocol VectorOperations: CustomStringConvertible {
@@ -436,13 +472,33 @@ protocol VectorOperations: CustomStringConvertible {
   
   // "Matrix \(dataType) \(library)"
   var description: String { get }
+  
+  init(dimension: Int, defaultValue: Scalar)
+  
+  subscript(index: Int) -> Scalar { get set }
 }
 
 struct AnyMatrixOperations {
   var value: any MatrixOperations
   
+  var dimension: Int { value.dimension }
+  
   init(_ value: any MatrixOperations) {
     self.value = value
+  }
+  
+  func makeRealVector() -> any VectorOperations {
+    func bypassTypeChecking<T: MatrixOperations>(value: T) -> any VectorOperations {
+      return T.RealVector(dimension: value.dimension, defaultValue: .zero)
+    }
+    return bypassTypeChecking(value: value)
+  }
+  
+  func makeMatrix() -> any MatrixOperations {
+    func bypassTypeChecking<T: MatrixOperations>(value: T) -> any MatrixOperations {
+      return T(dimension: value.dimension, defaultValue: .zero)
+    }
+    return bypassTypeChecking(value: value)
   }
   
   func matrixMultiply(by other: any MatrixOperations, into result: inout any MatrixOperations) {
@@ -450,6 +506,50 @@ struct AnyMatrixOperations {
       (value as! T).matrixMultiply(by: other as! T, into: &result)
     }
     bypassTypeChecking(result: &result)
+  }
+  
+  func eigenDecomposition(into values: inout any VectorOperations, vectors: inout any MatrixOperations) {
+    func bypassTypeChecking<T: MatrixOperations>(vectors: inout T) {
+      var valuesCopy = values as! T.RealVector
+      (value as! T).eigenDecomposition(into: &valuesCopy, vectors: &vectors)
+      values = valuesCopy
+    }
+    bypassTypeChecking(vectors: &vectors)
+  }
+  
+  
+  subscript(row: Int, column: Int) -> any LinearAlgebraScalar {
+    get {
+      (value[row, column] as any LinearAlgebraScalar)
+    }
+    set {
+      func bypassTypeChecking<T: MatrixOperations>(value: inout T) {
+        value[row, column] = newValue as! T.Scalar
+      }
+      bypassTypeChecking(value: &value)
+    }
+  }
+}
+
+struct AnyVectorOperations {
+  var value: any VectorOperations
+  
+  var dimension: Int { value.dimension }
+  
+  init(_ value: any VectorOperations) {
+    self.value = value
+  }
+  
+  subscript(index: Int) -> any LinearAlgebraScalar {
+    get {
+      (value[index] as any LinearAlgebraScalar)
+    }
+    set {
+      func bypassTypeChecking<T: VectorOperations>(value: inout T) {
+        value[index] = newValue as! T.Scalar
+      }
+      bypassTypeChecking(value: &value)
+    }
   }
 }
 
@@ -567,23 +667,66 @@ extension Matrix: MatrixOperations {
       }
     }
     
-    var rwork = [T](repeating: 0, count: max(1, 3 * dim - 2))
+    // WARNING: --------------
+    // Change the WORK size heuristic depending on whether you're using a
+    // divide-and-conquer method.
+    
+    #if false
+    var lworkSize: Int = max(1, 3 * dim - 2)
+    lworkSize = max(lworkSize, (32 + 2) * dim)
+    var rworkSize: Int = max(1, 3 * dim - 2)
+    #else
+    var lworkSize: Int = 1 + 6 * dim + 2 * dim * dim
+    var rworkSize: Int = 0
+    if Scalar.self == Complex<Double>.self {
+      lworkSize = 2 * dim + dim * dim
+      rworkSize = 1 + 5 * dim + 2 * dim * dim
+    }
+    var iworkSize: Int = 3 + 5 * dim
+    #endif
+    
+    var lwork = [T](repeating: 0, count: lworkSize)
+    var rwork = [T.RealType](repeating: 0, count: rworkSize)
+    var iwork = [Int](repeating: 0, count: iworkSize)
+    
     values.storage.withUnsafeMutableBufferPointer { pointerW in
       let W = pointerW.baseAddress
       
-      vectors.storage.withUnsafeMutableBufferPointer { pointerAP in
-        let AP = unsafeBitCast(pointerAP.baseAddress, to: T.MutablePointerSelf?.self)
+      vectors.storage.withUnsafeMutableBufferPointer { pointerA in
+        let A = unsafeBitCast(pointerA.baseAddress, to: T.MutablePointerSelf?.self)
         
-        rwork.withUnsafeMutableBufferPointer { pointerRWORK in
-          let RWORK = unsafeBitCast(pointerRWORK.baseAddress, to: T.MutablePointerSelf.self)
+        lwork.withUnsafeMutableBufferPointer { pointerLWORK in
+          let LWORK = unsafeBitCast(pointerLWORK.baseAddress, to: T.MutablePointerSelf.self)
           
-          var lworkSize: Int = 0
-          Scalar.linearAlgebraFunctions.syev(
-            "V", "N", &dim, AP, &dim, W,
-            RWORK /* nothing else to put here? */, &lworkSize, nil, &error)
+          lworkSize = -1
+          rworkSize = -1
+          iworkSize = -1
+          
+          Scalar.linearAlgebraFunctions.syevd(
+            "V", "U", &dim, A, &dim, W,
+            LWORK, &lworkSize, &rwork,
+            //
+            &rworkSize, &iwork, &iworkSize,
+            //
+            &error)
+          
+          // The bug might be from not explicitly calling 'withUnsafeMutableBufferPointer' on the Swift arrays.
+          print(UnsafeRawPointer(OpaquePointer(unsafeBitCast(LWORK, to: UnsafeRawPointer.self))).assumingMemoryBound(to: Int.self).pointee)
+          print(UnsafeRawPointer(OpaquePointer(unsafeBitCast(LWORK, to: UnsafeRawPointer.self))).assumingMemoryBound(to: Float.self).pointee)
+          rwork.withUnsafeMutableBufferPointer {
+            print(UnsafeRawPointer(OpaquePointer($0.baseAddress!)).assumingMemoryBound(to: Int.self).pointee)
+          }
+          print(rwork[0])
+          print(iwork[0])
+          
+          Scalar.linearAlgebraFunctions.syevd(
+            "V", "U", &dim, A, &dim, W,
+            LWORK, &lworkSize, &rwork,
+            //
+            &rworkSize, &iwork, &iworkSize,
+            //
+            &error)
           checkLAPACKError(error)
-          
-          // TODO: Finish the eigendecomposition operation.
         }
       }
     }
@@ -643,6 +786,11 @@ extension PythonMatrix: MatrixOperations {
   func eigenDecomposition(into values: inout RealVector, vectors: inout PythonMatrix<T>) {
     // implement eigenvalue decomposition using NumPy functions
     // store the values and vectors in the inout parameters
+    checkDimensions(self, values, vectors)
+    
+    let (a1, a2) = np.linalg.eigh(self.storage, UPLO: "U").tuple2
+    np.copyto(values.storage, a1)
+    np.copyto(vectors.storage, a2)
   }
   
   func solveLinearSystem(with rhs: PythonMatrix<T>, into solution: inout PythonMatrix<T>) {
