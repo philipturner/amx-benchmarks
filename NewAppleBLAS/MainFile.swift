@@ -168,137 +168,208 @@ func mainFunc() {
 
 // Stuff that I should wrap in an iteration over the generic type.
 func boilerplateLikeCode() {
-  do {
-    // create a 3x3 matrix of numbers with default value 0
-    var m = Matrix<Float>(dimension: 3, defaultValue: 0)
-    
-    // set some elements using the subscript operator
-    m[0, 0] = 1
-    m[1, 1] = 2
-    m[2, 2] = 3
-    
-    // print the matrix using a nested loop
-    for i in 0..<m.dimension {
-      for j in 0..<m.dimension {
-        print(m[i, j], terminator: " ")
-      }
-      print()
-    }
-    
-    var out = m
-    m.matrixMultiply(by: m, into: &out)
-    print(out)
-  }
+  let N: Int = 3
   
-  do {
-    // create a 3x3 matrix of numbers with default value 0
-    var m = Matrix<Double>(dimension: 3, defaultValue: 0)
-    
-    // set some elements using the subscript operator
-    m[0, 0] = 1
-    m[1, 1] = 2
-    m[2, 2] = 3
-    
-    // print the matrix using a nested loop
-    for i in 0..<m.dimension {
-      for j in 0..<m.dimension {
-        print(m[i, j], terminator: " ")
-      }
-      print()
-    }
-    
-    var out = m
-    m.matrixMultiply(by: m, into: &out)
-    print(out)
-  }
-  
-  do {
-    // create a 3x3 matrix of numbers with default value 0
-    var m = Matrix<Complex<Double>>(dimension: 3, defaultValue: 0)
-    
-    // set some elements using the subscript operator
-    m[0, 0] = 1
-    m[1, 1] = 2
-    m[2, 2] = 3
-    
-    // print the matrix using a nested loop
-    for i in 0..<m.dimension {
-      for j in 0..<m.dimension {
-        print(m[i, j], terminator: " ")
-      }
-      print()
-    }
-    
-    var out = m
-    m.matrixMultiply(by: m, into: &out)
-    print(out)
-  }
-  
+  // create some matrices of different data types and libraries
+  let matrixFloat = Matrix<Float>(dimension: N, defaultValue: 0) // a Float matrix using Accelerate
+  let matrixDouble = Matrix<Double>(dimension: N, defaultValue: 0) // a Double matrix using Accelerate
+  let matrixComplex = Matrix<Complex<Double>>(dimension: N, defaultValue: 0) // a Complex<Double> matrix using Accelerate
   #if os(macOS)
-  do {
-    // create a 3x3 matrix of numbers with default value 0
-    var m = PythonMatrix<Float>(dimension: 3, defaultValue: 0)
-
-    // set some elements using the subscript operator
-    m[0, 0] = 1
-    m[1, 1] = 2
-    m[2, 2] = 3
-
-    // print the matrix using a nested loop
-    for i in 0..<m.dimension {
-        for j in 0..<m.dimension {
-            print(m[i, j], terminator: " ")
-        }
-        print()
-    }
-    
-    var out = m
-    m.matrixMultiply(by: m, into: &out)
-    print(out)
-  }
-  
-  do {
-    // create a 3x3 matrix of numbers with default value 0
-    var m = PythonMatrix<Double>(dimension: 3, defaultValue: 0)
-
-    // set some elements using the subscript operator
-    m[0, 0] = 1
-    m[1, 1] = 2
-    m[2, 2] = 3
-
-    // print the matrix using a nested loop
-    for i in 0..<m.dimension {
-        for j in 0..<m.dimension {
-            print(m[i, j], terminator: " ")
-        }
-        print()
-    }
-    
-    var out = m
-    m.matrixMultiply(by: m, into: &out)
-    print(out)
-  }
-  
-  do {
-    // create a 3x3 matrix of numbers with default value 0
-    var m = PythonMatrix<Complex<Double>>(dimension: 3, defaultValue: 0)
-
-    // set some elements using the subscript operator
-    m[0, 0] = 1
-    m[1, 1] = 2
-    m[2, 2] = 3
-
-    // print the matrix using a nested loop
-    for i in 0..<m.dimension {
-        for j in 0..<m.dimension {
-            print(m[i, j], terminator: " ")
-        }
-        print()
-    }
-    
-    var out = m
-    m.matrixMultiply(by: m, into: &out)
-    print(out)
-  }
+  let pythonMatrixFloat = PythonMatrix<Float>(dimension: N, defaultValue: 0) // a Float matrix using NumPy
+  let pythonMatrixDouble = PythonMatrix<Double>(dimension: N, defaultValue: 0) // a Double matrix using NumPy
+  let pythonMatrixComplex = PythonMatrix<Complex<Double>>(dimension: N, defaultValue: 0) // a Complex<Double> matrix using NumPy
   #endif
+  
+  // create an array of matrices as type-erased wrappers
+  var matrices: [(AnyMatrixOperations, (Double) -> any LinearAlgebraScalar)] = [
+    (AnyMatrixOperations(matrixFloat), { Float($0) }),
+    (AnyMatrixOperations(matrixDouble), { Double($0) }),
+    (AnyMatrixOperations(matrixComplex), { Complex<Double>($0, 0) })
+  ]
+  #if os(macOS)
+  matrices += [
+    (AnyMatrixOperations(pythonMatrixFloat), { Float($0) }),
+    (AnyMatrixOperations(pythonMatrixDouble), { Double($0) }),
+    (AnyMatrixOperations(pythonMatrixComplex), { Complex<Double>($0, 0) })
+  ]
+  #endif
+  
+  for (matrix, generate) in matrices {
+    // create a 3x3 matrix of numbers with default value 0
+    var m = matrix
+    for i in 0..<m.dimension {
+      for j in 0..<m.dimension {
+        m[i, j] = generate(0)
+      }
+    }
+    
+    // set some elements using the subscript operator
+    
+    m[0, 0] = generate(1)
+    m[1, 1] = generate(2)
+    m[2, 2] = generate(3)
+    
+    // print the matrix using a nested loop
+    var out = m
+    m.matrixMultiply(by: m.value, into: &out.value)
+    for i in 0..<m.dimension {
+      for j in 0..<m.dimension {
+        print(out[i, j], terminator: " ")
+      }
+      print()
+    }
+    print(out)
+  }
+  
+  for (matrix, generate) in matrices {
+    // create a 3x3 matrix of numbers with default value 0
+    var m = matrix
+    for i in 0..<m.dimension {
+      for j in 0..<m.dimension {
+        m[i, j] = generate(0)
+      }
+    }
+    
+    // set some elements using the subscript operator
+    
+    m[0, 0] = generate(1)
+    m[1, 1] = generate(2)
+    m[2, 2] = generate(3)
+    
+    // print the matrix using a nested loop
+    var values = m.makeRealVector()
+    var vectors = m.makeMatrix()
+    m.eigenDecomposition(into: &values, vectors: &vectors)
+    
+    for i in 0..<m.dimension {
+      for j in 0..<m.dimension {
+        print(m[i, j], terminator: " ")
+      }
+      print()
+    }
+    for i in 0..<m.dimension {
+      print(AnyVectorOperations(values)[i], terminator: " ")
+      print()
+    }
+    for i in 0..<m.dimension {
+      for j in 0..<m.dimension {
+        print(AnyMatrixOperations(vectors)[i, j], terminator: " ")
+      }
+      print()
+    }
+    print(values)
+    print(vectors)
+  }
+  
+//  do {
+//    // create a 3x3 matrix of numbers with default value 0
+//    var m = Matrix<Double>(dimension: 3, defaultValue: 0)
+//    
+//    // set some elements using the subscript operator
+//    m[0, 0] = 1
+//    m[1, 1] = 2
+//    m[2, 2] = 3
+//    
+//    // print the matrix using a nested loop
+//    for i in 0..<m.dimension {
+//      for j in 0..<m.dimension {
+//        print(m[i, j], terminator: " ")
+//      }
+//      print()
+//    }
+//    
+//    var out = m
+//    m.matrixMultiply(by: m, into: &out)
+//    print(out)
+//  }
+//  
+//  do {
+//    // create a 3x3 matrix of numbers with default value 0
+//    var m = Matrix<Complex<Double>>(dimension: 3, defaultValue: 0)
+//    
+//    // set some elements using the subscript operator
+//    m[0, 0] = 1
+//    m[1, 1] = 2
+//    m[2, 2] = 3
+//    
+//    // print the matrix using a nested loop
+//    for i in 0..<m.dimension {
+//      for j in 0..<m.dimension {
+//        print(m[i, j], terminator: " ")
+//      }
+//      print()
+//    }
+//    
+//    var out = m
+//    m.matrixMultiply(by: m, into: &out)
+//    print(out)
+//  }
+//  
+//  #if os(macOS)
+//  do {
+//    // create a 3x3 matrix of numbers with default value 0
+//    var m = PythonMatrix<Float>(dimension: 3, defaultValue: 0)
+//
+//    // set some elements using the subscript operator
+//    m[0, 0] = 1
+//    m[1, 1] = 2
+//    m[2, 2] = 3
+//
+//    // print the matrix using a nested loop
+//    for i in 0..<m.dimension {
+//        for j in 0..<m.dimension {
+//            print(m[i, j], terminator: " ")
+//        }
+//        print()
+//    }
+//    
+//    var out = m
+//    m.matrixMultiply(by: m, into: &out)
+//    print(out)
+//  }
+//  
+//  do {
+//    // create a 3x3 matrix of numbers with default value 0
+//    var m = PythonMatrix<Double>(dimension: 3, defaultValue: 0)
+//
+//    // set some elements using the subscript operator
+//    m[0, 0] = 1
+//    m[1, 1] = 2
+//    m[2, 2] = 3
+//
+//    // print the matrix using a nested loop
+//    for i in 0..<m.dimension {
+//        for j in 0..<m.dimension {
+//            print(m[i, j], terminator: " ")
+//        }
+//        print()
+//    }
+//    
+//    var out = m
+//    m.matrixMultiply(by: m, into: &out)
+//    print(out)
+//  }
+//  
+//  do {
+//    // create a 3x3 matrix of numbers with default value 0
+//    var m = PythonMatrix<Complex<Double>>(dimension: 3, defaultValue: 0)
+//
+//    // set some elements using the subscript operator
+//    m[0, 0] = 1
+//    m[1, 1] = 2
+//    m[2, 2] = 3
+//
+//    // print the matrix using a nested loop
+//    for i in 0..<m.dimension {
+//        for j in 0..<m.dimension {
+//            print(m[i, j], terminator: " ")
+//        }
+//        print()
+//    }
+//    
+//    var out = m
+//    m.matrixMultiply(by: m, into: &out)
+//    print(out)
+//  }
+//  #endif
 }
