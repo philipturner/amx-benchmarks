@@ -155,4 +155,4 @@ _GFLOPS/k for each operation used in quantum chemistry. This metric compares eac
 | | ISA Documentation | Performance Documentation | OSS GEMM Libraries |
 | - | - | - | - |
 | Apple AMX | [corsix/amx](https://github.com/corsix/amx) | [philipturner/amx-benchmarks](https://github.com/philipturner/amx-benchmarks) | [xrq-phys/blis_apple](https://github.com/xrq-phys/blis_apple) |
-| Apple GPU | [dougallj/applegpu](https://github.com/dougallj/applegpu) | [philipturner/metal-benchmarks](https://github.com/philipturner/metal-benchmarks) | [geohot/tinygrad](https://github.com/geohot/tinygrad) |
+| Apple GPU | [dougallj/applegpu](https://github.com/dougallj/applegpu) | [philipturner/metal-benchmarks](https://github.com/philipturner/metal-benchmarks) | [philipturner/metal-flash-attention](https://github.com/philipturner/metal-flash-attention) |
