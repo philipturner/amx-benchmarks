@@ -162,7 +162,7 @@ struct LinearAlgebraFunctions<T: LinearAlgebraScalar> {
     _ LWORK: UnsafePointer<__LAPACK_int>,
     _ RWORK: T.MutablePointerReal?,
     _ LRWORK: UnsafePointer<__LAPACK_int>,
-    _ IWORK: UnsafeMutablePointer<Int>,
+    _ IWORK: UnsafeMutablePointer<Int>?,
     _ LIWORK: UnsafePointer<__LAPACK_int>,
     _ INFO: UnsafeMutablePointer<__LAPACK_int>) -> Void
   
@@ -238,7 +238,7 @@ func wrap_syevd<T: LinearAlgebraScalar>(
     _ W: T.MutablePointerReal?,
     _ WORK: T.MutablePointerSelf,
     _ LWORK: UnsafePointer<__LAPACK_int>,
-    _ IWORK: UnsafeMutablePointer<Int>,
+    _ IWORK: UnsafeMutablePointer<Int>?,
     _ LIWORK: UnsafePointer<__LAPACK_int>,
     _ INFO: UnsafeMutablePointer<__LAPACK_int>
   ) -> Void
@@ -662,32 +662,17 @@ extension Matrix: MatrixOperations {
       vectors.storage.withUnsafeMutableBufferPointer { pointerAP in
         let AP = unsafeBitCast(pointerAP.baseAddress, to: T.MutablePointerSelf?.self)
         
-        Scalar.linearAlgebraFunctions.trttp("U", &dim, A, &dim, AP, &error)
-        checkLAPACKError(error)
+        memcpy(unsafeBitCast(AP, to: UnsafeMutableRawPointer.self), unsafeBitCast(A, to: UnsafeMutableRawPointer.self), dim * dim * MemoryLayout<T>.stride)
       }
     }
     
-    // WARNING: --------------
-    // Change the WORK size heuristic depending on whether you're using a
-    // divide-and-conquer method.
+    var lworkSize: Int = -1
+    var rworkSize: Int = -1
+    var iworkSize: Int = -1
     
-    #if false
-    var lworkSize: Int = max(1, 3 * dim - 2)
-    lworkSize = max(lworkSize, (32 + 2) * dim)
-    var rworkSize: Int = max(1, 3 * dim - 2)
-    #else
-    var lworkSize: Int = 1 + 6 * dim + 2 * dim * dim
-    var rworkSize: Int = 0
-    if Scalar.self == Complex<Double>.self {
-      lworkSize = 2 * dim + dim * dim
-      rworkSize = 1 + 5 * dim + 2 * dim * dim
-    }
-    var iworkSize: Int = 3 + 5 * dim
-    #endif
-    
-    var lwork = [T](repeating: 0, count: lworkSize)
-    var rwork = [T.RealType](repeating: 0, count: rworkSize)
-    var iwork = [Int](repeating: 0, count: iworkSize)
+    var lwork: [T] = [.zero]
+    var rwork: [T.RealType] = [.zero]
+    var iwork: [Int] = [.zero]
     
     values.storage.withUnsafeMutableBufferPointer { pointerW in
       let W = pointerW.baseAddress
@@ -698,35 +683,50 @@ extension Matrix: MatrixOperations {
         lwork.withUnsafeMutableBufferPointer { pointerLWORK in
           let LWORK = unsafeBitCast(pointerLWORK.baseAddress, to: T.MutablePointerSelf.self)
           
-          lworkSize = -1
-          rworkSize = -1
-          iworkSize = -1
-          
-          Scalar.linearAlgebraFunctions.syevd(
-            "V", "U", &dim, A, &dim, W,
+          Scalar.linearAlgebraFunctions.syev(
+            "V", "U", &dim, nil, &dim, nil,
             LWORK, &lworkSize, &rwork,
             //
-            &rworkSize, &iwork, &iworkSize,
-            //
-            &error)
-          
-          // The bug might be from not explicitly calling 'withUnsafeMutableBufferPointer' on the Swift arrays.
-          print(UnsafeRawPointer(OpaquePointer(unsafeBitCast(LWORK, to: UnsafeRawPointer.self))).assumingMemoryBound(to: Int.self).pointee)
-          print(UnsafeRawPointer(OpaquePointer(unsafeBitCast(LWORK, to: UnsafeRawPointer.self))).assumingMemoryBound(to: Float.self).pointee)
-          rwork.withUnsafeMutableBufferPointer {
-            print(UnsafeRawPointer(OpaquePointer($0.baseAddress!)).assumingMemoryBound(to: Int.self).pointee)
-          }
-          print(rwork[0])
-          print(iwork[0])
-          
-          Scalar.linearAlgebraFunctions.syevd(
-            "V", "U", &dim, A, &dim, W,
-            LWORK, &lworkSize, &rwork,
-            //
-            &rworkSize, &iwork, &iworkSize,
+//            &rworkSize, &iwork, &iworkSize,
             //
             &error)
           checkLAPACKError(error)
+        }
+        
+        if T.self == Float.self {
+          lworkSize = Int(lwork[0] as! Float)
+          rworkSize = Int(rwork[0] as! Float)
+        } else if T.self == Double.self {
+          lworkSize = Int(lwork[0] as! Double)
+          rworkSize = Int(rwork[0] as! Double)
+        } else if T.self == Complex<Double>.self {
+          lworkSize = Int((lwork[0] as! Complex<Double>).real)
+          print("Complex", (lwork[0] as! Complex<Double>))
+          rworkSize = Int(rwork[0] as! Double)
+        }
+        iworkSize = iwork[0]
+        rworkSize = max(1, 3 * dim - 2)
+        print(lworkSize, rworkSize, iworkSize)
+        
+        lwork = Array(repeating: .zero, count: lworkSize)
+        rwork = Array(repeating: .zero, count: rworkSize)
+        iwork = Array(repeating: .zero, count: iworkSize)
+        
+        lwork.withUnsafeMutableBufferPointer { pointerLWORK in
+          let LWORK = unsafeBitCast(pointerLWORK.baseAddress, to: T.MutablePointerSelf.self)
+          
+          rwork.withUnsafeMutableBufferPointer { RWORK in
+            iwork.withUnsafeMutableBufferPointer { IWORK in
+              Scalar.linearAlgebraFunctions.syev(
+                "V", "U", &dim, A, &dim, W,
+                LWORK, &lworkSize, RWORK.baseAddress,
+                //
+//                &rworkSize, IWORK.baseAddress, &iworkSize,
+                //
+                &error)
+              checkLAPACKError(error)
+            }
+          }
         }
       }
     }

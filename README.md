@@ -90,10 +90,10 @@ Non-hybrid algorithms (all on one processor, either the CPU cores, AMX units, or
 | --------- | ---------------- | -------- | ---------- | ----- | ---------- | --------- | --------- | ---------- |
 | SGEMM | 2 | 362.2 | 1327.4 | 4629.0 | 84.4% | 85.4% | 87.2% | 9258.0 | 
 | DGEMM | 2 | 176.2 | 337.9  | -      | 90.7% | 87.0% | -     | 675.8  | 
-| ZGEMM | 2 | 148.4 | 223.6  | -      | 76.4% | 57.6% | -     | 447.2  | 
-| SSYEV (e-vecs) | n/a |
-| DSYEV (e-vecs) | n/a |
-| ZHEEV (e-vecs) | n/a |
+| ZGEMM | 2 | 148.4 | 223.6  | -      | 76.4% | 57.6% | -     | 447.2  |
+| SSYEV(D) | n/a |
+| DSYEV(D) | n/a |
+| ZHEEV(D) | n/a |
 | SPOTRF | - |
 | DPOTRF | - |
 | ZPOTRF | - |
