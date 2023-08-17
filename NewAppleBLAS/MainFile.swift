@@ -14,14 +14,19 @@ import ComplexModule
 
 func mainFunc() {
   #if os(macOS)
+//  let downloadsURL = FileManager.default.urls(
+//    for: .downloadsDirectory, in: .userDomainMask)[0]
+//  let homePath = downloadsURL.deletingLastPathComponent().relativePath
+//  PythonLibrary.useLibrary(at: homePath + "/miniforge3/bin/python")
+  
   let downloadsURL = FileManager.default.urls(
-    for: .downloadsDirectory, in: .userDomainMask)[0]
-  let homePath = downloadsURL.deletingLastPathComponent().relativePath
-  PythonLibrary.useLibrary(at: homePath + "/miniforge3/bin/python")
+        for: .downloadsDirectory, in: .userDomainMask)[0]
+      let homePath = downloadsURL.deletingLastPathComponent().relativePath
+      let packages = homePath + "/miniforge3/lib/python3.11/site-packages"
+      setenv("PYTHONPATH", packages, 1)
   print(Python.version)
   print()
   
-  // TODO: Query number of performance cores on machines besides Mx Pro/Max.
   setenv("NUM_THREADS", "8", 0)
   setenv("OMP_NUM_THREADS", "8", 0)
   setenv("OPENBLAS_NUM_THREADS", "8", 0)
