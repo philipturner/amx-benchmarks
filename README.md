@@ -91,12 +91,15 @@ Non-hybrid algorithms (all on one processor, either the CPU cores, AMX units, or
 | SGEMM | 2 | 362.2 | 1327.4 | 4629.0 | 84.4% | 85.4% | 87.2% | 9258.0 | 
 | DGEMM | 2 | 176.2 | 337.9  | -      | 90.7% | 87.0% | -     | 675.8  | 
 | ZGEMM | 2 | 148.4 | 223.6  | -      | 76.4% | 57.6% | -     | 447.2  |
-| SSYEV(D) | n/a |
-| DSYEV(D) | n/a |
-| ZHEEV(D) | n/a |
-| SPOTRF | - |
-| DPOTRF | - |
-| ZPOTRF | - |
+| SSYEV | TBD | 1.03 | 1.62 | - |
+| DSYEV | TBD | 1.04 | 1.10 | - |
+| ZHEEV | TBD | 1.92 | 1.36 | - |
+| SPOTRF |
+| DPOTRF |
+| ZPOTRF |
+| STRSM |
+| DTRSM |
+| ZTRSM |
 
 _GFLOPS/k for each operation used in quantum chemistry. This metric compares each operation's execution speed regardless of the algorithm used to perform it, or the formula used to estimate GFLOPS. Complex-valued operations use GFLOPS/0.25k to directly compare ALU utilization to real-valued operations. For every operation listed so far, complex-valued versions are slower because they must de-interleave the numbers before processing them._
 
