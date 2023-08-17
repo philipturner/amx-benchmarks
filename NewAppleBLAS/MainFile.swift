@@ -221,20 +221,45 @@ func boilerplateLikeCode() {
     print(out)
   }
   
+  var diagonalizable_matrix: PythonObject
+  do {
+    let np = Python.import("numpy")
+    let scipy_stats = Python.import("scipy.stats")
+    let u = scipy_stats.unitary_group.rvs(3)
+    let U = np.asmatrix(u)
+    let random_numbers = np.random.rand(3)
+    let diagonal_matrix = np.diag(random_numbers)
+    diagonalizable_matrix = np.linalg.inv(U) * diagonal_matrix * U
+    
+    print()
+    print("==========")
+    print(U)
+    print(diagonal_matrix)
+    print(diagonalizable_matrix)
+    print("==========")
+    print()
+  }
+  
   for (matrix, generate) in matrices {
     // create a 3x3 matrix of numbers with default value 0
     var m = matrix
+//    for i in 0..<m.dimension {
+//      for j in 0..<m.dimension {
+//        m[i, j] = generate(0)
+//      }
+//    }
+//    
+//    // set some elements using the subscript operator
+//    
+//    m[0, 0] = generate(1)
+//    m[1, 1] = generate(2)
+//    m[2, 2] = generate(3)
     for i in 0..<m.dimension {
       for j in 0..<m.dimension {
-        m[i, j] = generate(0)
+        m[i, j] = generate(Double(diagonalizable_matrix[PythonObject(tupleOf: i, j)])!)
       }
     }
     
-    // set some elements using the subscript operator
-    
-    m[0, 0] = generate(1)
-    m[1, 1] = generate(2)
-    m[2, 2] = generate(3)
     
     // print the matrix using a nested loop
     var values = m.makeRealVector()
