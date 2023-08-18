@@ -13,7 +13,7 @@ Table of Contents
 
 According a [recent research paper (2023)](https://pubs.acs.org/doi/10.1021/acs.jctc.2c00983), the LOBPCG iterations can be partitioned into stages with different precisions. The first iterations use single precision, while the last iterations use double precision. The researchers used a consumer RTX A4000 with a 1:32 ratio of FP64:FP32 compute power. They achieved 6-8x speedup over GPU FP64 and negligible accuracy loss. A host CPU was used for ZHEEV, but that operation only consumed 3-10% of the total time.
 
-For Apple silicon, the best adaptation of this algorithm would use CPU and GPU simultaneously. The AMX would not perform the majority of operations, but its presence would still be important. Below is a tentative illustration of the scheme\**:
+For Apple silicon, the best adaptation of this algorithm would use CPU and GPU simultaneously. The AMX would not perform the majority of operations, but its presence would still be important. Below is a tentative illustration of the scheme\*:
 
 - 65% of iterations: GPU FP32 (CHEMM) + GPU FP32 (CHEEV)
 - 15% of iterations: GPU FP32 (CHEMM) + GPU double-single (ZHEEV)
