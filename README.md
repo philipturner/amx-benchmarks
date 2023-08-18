@@ -74,16 +74,6 @@ Real:    GFLOPS = GFLOPS/k * k_real
 Complex: GFLOPS = GFLOPS/0.25k * 0.25k_complex
 ```
 
-TODO: Compare Apple's new BLAS library to the old BLAS library:
-- sgemm, dgemm, zgemm
-- ssymm, dsymm, zhemm
-- ssyev(d), dsyev(d), zheev(d), newer \_2stage approaches added to the newer Accelerate
-- xcholesky, xpotrf, xtrsm
-
-TODO: Add custom implementations using the GPU
-- Hybrid CPU/GPU for certain algorithms, reproducing research papers such as MAGMA
-- Benchmarking and testing suite with similar quality to MFA
-
 Non-hybrid algorithms (all on one processor, either the CPU cores, AMX units, or GPU cores)
 
 | Operation | k<sub>real</sub> | OpenBLAS GFLOPS/k | Accelerate GFLOPS/k | Metal GFLOPS/k | NEON % | AMX % | GPU % | Max GFLOPS |
@@ -91,9 +81,9 @@ Non-hybrid algorithms (all on one processor, either the CPU cores, AMX units, or
 | SGEMM | 2 | 362.2 | 1327.4 | 4629.0 | 84.4% | 85.4% | 87.2% | 9258.0 | 
 | DGEMM | 2 | 176.2 | 337.9  | -      | 90.7% | 87.0% | -     | 675.8  | 
 | ZGEMM | 2 | 148.4 | 223.6  | -      | 76.4% | 57.6% | -     | 447.2  |
-| SSYEV | TBD | 1.03 | 5.03 | - |
-| DSYEV | TBD | 1.04 | 3.66 | - |
-| ZHEEV | TBD | 2.00 | 4.36 | - |
+| SSYEV | TBD | 4.54 | 12.9 | -      | TBD | TBD | - | TBD |
+| DSYEV | TBD | 4.57 | 7.74 | -      | TBD | TBD | - | TBD |
+| ZHEEV | TBD | 6.76 | 5.48 | -      | TBD | TBD | - | TBD |
 | SPOTRF |
 | DPOTRF |
 | ZPOTRF |
@@ -102,6 +92,8 @@ Non-hybrid algorithms (all on one processor, either the CPU cores, AMX units, or
 | ZTRSM |
 
 _GFLOPS/k for each operation used in quantum chemistry. This metric compares each operation's execution speed regardless of the algorithm used to perform it, or the formula used to estimate GFLOPS. Complex-valued operations use GFLOPS/0.25k to directly compare ALU utilization to real-valued operations. For every operation listed so far, complex-valued versions are slower because they must de-interleave the numbers before processing them._
+
+_ZHEEV achieved maximum performance on Accelerate with MRRR. All other eigendecompositions use the divide and conquer algorithm. Although OpenBLAS beats Accelerate with asymptotically large matrices, Accelerate is faster for the matrix sizes typically encountered in DFT._
 
 ## Related Work
 

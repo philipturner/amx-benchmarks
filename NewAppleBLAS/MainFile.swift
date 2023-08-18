@@ -42,7 +42,11 @@ func mainFunc() {
   let REPS = 50
   
   // define a constant for the dimension
-  let N = 512
+  let N = 64
+  
+  // Enable tests for each operation separately.
+  let doGEMM: Bool = false
+  let doSYEV: Bool = true
   
   // define a function that takes two matrices and performs matrix multiplication on them
   // use generic parameters that conform to MatrixOperations protocol
@@ -97,16 +101,16 @@ func mainFunc() {
   #endif
   
   // create an array of matrices as type-erased wrappers
-  var matrices: [AnyMatrixOperations] = [
-    AnyMatrixOperations(matrixFloat),
-    AnyMatrixOperations(matrixDouble),
-    AnyMatrixOperations(matrixComplex)
+  var matrices: [(AnyMatrixOperations, (Double) -> any LinearAlgebraScalar)] = [
+    (AnyMatrixOperations(matrixFloat), { Float($0) }),
+    (AnyMatrixOperations(matrixDouble), { Double($0) }),
+    (AnyMatrixOperations(matrixComplex), { Complex<Double>($0, 0) })
   ]
   #if os(macOS)
   matrices += [
-    AnyMatrixOperations(pythonMatrixFloat),
-    AnyMatrixOperations(pythonMatrixDouble),
-    AnyMatrixOperations(pythonMatrixComplex)
+    (AnyMatrixOperations(pythonMatrixFloat), { Float($0) }),
+    (AnyMatrixOperations(pythonMatrixDouble), { Double($0) }),
+    (AnyMatrixOperations(pythonMatrixComplex), { Complex<Double>($0, 0) })
   ]
   #endif
   
@@ -117,7 +121,10 @@ func mainFunc() {
     return Double(N * N * N) / time / 1e9
   }
   
-  for matrix in matrices {
+  for (matrix, _) in matrices {
+    if !doGEMM {
+      continue
+    }
     loopBody(matrix.value)
     
     func loopBody<T: MatrixOperations>(_ matrix: T) {
@@ -159,10 +166,82 @@ func mainFunc() {
   // print the dictionary of minimum elapsed times for each function and data type combination
 //  print(minElapsedTimes)
   
+  var diagonalizable_matrix: PythonObject
+  do {
+    let np = Python.import("numpy")
+    let scipy_stats = Python.import("scipy.stats")
+    let u = scipy_stats.ortho_group.rvs(N)
+    let U = np.asmatrix(u)
+    let random_numbers = np.random.rand(N)
+    let diagonal_matrix = np.diag(random_numbers)
+    diagonalizable_matrix = np.linalg.inv(U) * diagonal_matrix * U
+  }
+  
+  for (matrix, generate) in matrices {
+    if !doSYEV {
+      continue
+    }
+    loopBody(matrix.value)
+    
+    func loopBody<T: MatrixOperations>(_ matrix: T) {
+      // get the data type and library name from the matrix description
+      let dataType = String(matrix.description.split(separator: " ")[1])
+      let libraryName = String(matrix.description.split(separator: " ")[2])
+      
+      var m = matrix
+      var values = T.RealVector(dimension: N, defaultValue: 0)
+      var vectors = T(dimension: N, defaultValue: 0)
+      
+      if T.Scalar.self == Complex<Double>.self {
+        for i in 0..<m.dimension {
+          for j in 0..<m.dimension {
+            var generated = generate(Double(diagonalizable_matrix[PythonObject(tupleOf: i, j)])!)
+            var casted = generated as! Complex<Double>
+            casted *= Complex<Double>(0.7071067812, 0.7071067812)
+            generated = casted
+            m[i, j] = generated as! T.Scalar
+          }
+        }
+      } else {
+        for i in 0..<m.dimension {
+          for j in 0..<m.dimension {
+            m[i, j] = generate(Double(diagonalizable_matrix[PythonObject(tupleOf: i, j)])!) as! T.Scalar
+          }
+        }
+      }
+      
+      // create a variable to store the minimum elapsed time for each function call
+      var minElapsed = Double.infinity
+      
+      // repeat the matrix multiplication N times
+      for _ in 1...REPS {
+        // get the current time before calling the function
+        let start = DispatchTime.now()
+        // perform matrix multiplication using the generic function
+//        matrixMultiply(lhs: lhs, rhs: rhs, into: &result)
+        eigenDecompose(matrix: m, into: &values, vectors: &vectors)
+        // get the current time after calling the function
+        let end = DispatchTime.now()
+        // calculate the elapsed time in seconds
+        let elapsed = Double(end.uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000_000
+        // update the minimum elapsed time if needed
+        minElapsed = min(minElapsed, elapsed)
+      }
+      
+      // store the minimum elapsed time for matrix multiplication in the dictionary
+      minElapsedTimes["\(libraryName)_\(dataType)_syev"] =
+        convert_GFLOPS_k(time: minElapsed)
+    }
+  }
+  
   for (key, value) in minElapsedTimes.enumerated()
     .sorted(by: { $0.element.key < $1.element.key })
   {
-    print(String(format: "%.1f", value.value), "\t\t", value.key)
+    if value.value < 10 {
+      print(String(format: "%.2f", value.value), "\t\t", value.key)
+    } else {
+      print(String(format: "%.1f", value.value), "\t\t", value.key)
+    }
   }
 }
 
@@ -225,7 +304,7 @@ func boilerplateLikeCode() {
   do {
     let np = Python.import("numpy")
     let scipy_stats = Python.import("scipy.stats")
-    let u = scipy_stats.unitary_group.rvs(3)
+    let u = scipy_stats.ortho_group.rvs(3)
     let U = np.asmatrix(u)
     let random_numbers = np.random.rand(3)
     let diagonal_matrix = np.diag(random_numbers)
@@ -256,7 +335,13 @@ func boilerplateLikeCode() {
 //    m[2, 2] = generate(3)
     for i in 0..<m.dimension {
       for j in 0..<m.dimension {
-        m[i, j] = generate(Double(diagonalizable_matrix[PythonObject(tupleOf: i, j)])!)
+        var generated = generate(Double(diagonalizable_matrix[PythonObject(tupleOf: i, j)])!)
+        if type(of: generated) == Complex<Double>.self {
+          var casted = generated as! Complex<Double>
+          casted *= Complex<Double>(0.7071067812, 0.7071067812)
+          generated = casted
+        }
+        m[i, j] = generated
       }
     }
     
